@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Form</title>
+    <link rel="stylesheet" type="text/css" href="css/Booking.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+
+<body>
+    <form action="Bookingbackend.php" method="post" class="booking-form">
+        <h2>Book Your Stay</h2>
+        <div class="form-group">
+            <label for="checkin">Check-in Date:</label>
+            <input type="text" id="checkin" name="checkin" required>
+        </div>
+        <div class="form-group">
+            <label for="checkout">Check-out Date:</label>
+            <input type="text" id="checkout" name="checkout" required>
+        </div>
+        <div class="form-group">
+            <label for="">Number of guests:</label>
+            <input type="number" name="persons" required>
+        </div>
+        <div class="form-group">
+            <label for="requests">Special Requests:</label>
+            <textarea name="requests" rows="4" cols="50"></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit" name="submit">Book Now</button>
+        </div>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Reserved dates fetched from the server-side
+        const reservedDates = <?php
+        include ("Mysqlconnection.php");
+        $reservations_result = mysqli_query($connection, "SELECT checkin, checkout FROM reservations");
+        $maintenance_result = mysqli_query($connection, "SELECT date FROM maintenance");
+
+        $dates = [];
+        while ($row = mysqli_fetch_assoc($reservations_result)) {
+            $checkin = date('Y-m-d', strtotime($row['checkin']));
+            $checkout = date('Y-m-d', strtotime($row['checkout']));
+            $dates[] = ['from' => $checkin, 'to' => $checkout];
+        }
+
+        $blocked_dates = [];
+        while ($row = mysqli_fetch_assoc($maintenance_result)) {
+            $blocked_dates[] = $row['date'];
+        }
+        echo json_encode(['reservations' => $dates, 'blocked' => $blocked_dates]);
+        ?>;
+
+        function isDateInRange(date, range) {
+            const dateTime = date.getTime();
+            return dateTime >= new Date(range.from).getTime() && dateTime <= new Date(range.to).getTime();
+        }
+
+        function getDisabledDates(dates) {
+            const disabled = [];
+            dates.forEach(range => {
+                const start = new Date(range.from);
+                const end = new Date(range.to);
+                let current = new Date(start);
+                while (current <= end) {
+                    disabled.push(current.toISOString().split('T')[0]);
+                    current.setDate(current.getDate() + 1);
+                }
+            });
+            return disabled;
+        }
+
+        const disabledDates = getDisabledDates(reservedDates.reservations).concat(reservedDates.blocked);
+
+        flatpickr("#checkin", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+            allowInput: true,
+            minDate: "today",
+            disable: disabledDates,
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length > 0) {
+                    const checkinDate = selectedDates[0];
+                    const checkoutPicker = flatpickr("#checkout", {
+                        dateFormat: "Y-m-d",
+                        altInput: true,
+                        altFormat: "F j, Y",
+                        allowInput: true,
+                        minDate: dateStr,
+                        disable: disabledDates.concat([{ from: checkinDate, to: checkinDate }]), // Include the check-in date
+                    });
+                }
+            }
+        });
+
+        flatpickr("#checkout", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+            allowInput: true,
+            minDate: "today",
+            disable: disabledDates
+        });
+    </script>
+</body>
+</html>
