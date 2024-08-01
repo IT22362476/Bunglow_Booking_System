@@ -1,0 +1,116 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+h1 {
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 2em;
+}
+
+form {
+    margin: 0 auto;
+    width: 90%;
+    max-width: 25em;
+    padding: 1.25em;
+    background-color: #f9f9f9;
+    border-radius: 0.3125em;
+    box-shadow: 0 0 0.625em rgba(0, 0, 0, 0.2);
+}
+
+.empInputContainer {
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center children horizontally */
+}
+
+.empInputContainer input {
+    border: none;
+    outline: none;
+    padding: 0.625em;
+    font-size: 1em;
+    background-color: #f0f0f0; /* Change the background color */
+    border-radius: 0.3125em; /* Add rounded corners */
+    width: 100%; /* Make input fields take full width of the container */
+    max-width: 18.75em; /* Optional: Set a max width for the input fields */
+}
+
+.empInputContainer label {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    margin-bottom: 0.3125em;
+    text-align: center; /* Center text in label */
+    font-size: 1em;
+}
+
+button {
+    padding: 0.625em 1.25em;
+    font-size: 1em;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 0.3125em;
+    cursor: pointer;
+    display: block; /* Ensures button is a block-level element */
+    margin: 0 auto; /* Center the button horizontally */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.empInputContainer a {
+    text-decoration: none; /* Removes the underline */
+    color: inherit; /* Inherits the color from the parent element, optional */
+    font-family: "Montserrat", sans-serif; /* Ensures consistent font family */
+    font-weight: 500; /* Ensures consistent font weight */
+    font-style: normal; /* Ensures consistent font style */
+    font-size: 0.875em;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 48em) {
+    form {
+        width: 90%;
+        padding: 1em;
+    }
+
+    .empInputContainer input {
+        padding: 0.5em;
+        font-size: 0.875em;
+    }
+
+    button {
+        padding: 0.5em 1em;
+        font-size: 0.875em;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 30em) {
+    form {
+        width: 95%;
+        padding: 0.625em;
+    }
+
+    .empInputContainer input {
+        padding: 0.375em;
+        font-size: 0.75em;
+    }
+
+    button {
+        padding: 0.375em 0.75em;
+        font-size: 0.75em;
+    }
+
+    h1 {
+        font-size: 1.25em;
+    }
+}
