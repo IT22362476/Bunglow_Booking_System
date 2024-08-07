@@ -1,35 +1,86 @@
+<?php
+include("Mysqlconnection.php");
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $query = "SELECT * FROM reservations WHERE invoicenumber = '$id'";
+    $result = mysqli_query($connection, $query);
+    $row = mysqli_fetch_assoc($result);
+}
+
+if (isset($_POST['update'])) {
+    $invoicenumber = $_POST['invoicenumber'];
+    $EmployeeID = $_POST['EmployeeID'];
+    $checkin = $_POST['checkin'];
+    $checkout = $_POST['checkout'];
+    $persons = $_POST['persons'];
+    $requests = $_POST['requests'];
+
+    // Fetch blocked dates
+    $blocked_dates_query = "SELECT date FROM maintenance";
+    $blocked_dates_result = mysqli_query($connection, $blocked_dates_query);
+    $blocked_dates = [];
+    while ($blocked_row = mysqli_fetch_assoc($blocked_dates_result)) {
+        $blocked_dates[] = $blocked_row['date'];
+    }
+
+    // Check for blocked dates within the check-in and check-out range
+    $blocked_in_range = false;
+    $current_date = strtotime($checkin);
+    $end_date = strtotime($checkout);
+    while ($current_date <= $end_date) {
+        if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
+            $blocked_in_range = true;
+            break;
+        }
+        $current_date = strtotime('+1 day', $current_date);
+    }
+
+    if ($blocked_in_range) {
+        echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
+    } else {
+        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+        mysqli_query($connection, $query);
+        header("Location: Superadminreservations.php");
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Form</title>
+    <title>Edit Reservation</title>
     <link rel="stylesheet" type="text/css" href="css/Booking.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
-
 <body>
-    <form action="Bookingbackend.php" method="post" class="booking-form">
-        <h2>Book Your Stay</h2>
+    <h2>Edit Reservation</h2>
+    <form action="edit_reservation.php?id=<?php echo $row['invoicenumber']; ?>" method="post" class="booking-form">
+        <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
+        <div class="form-group">
+            <label for="EmployeeID">Employee ID:</label>
+            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>" required>
+        </div>
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" required>
+            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>" required>
         </div>
         <div class="form-group">
             <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" required>
+            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>" required>
         </div>
         <div class="form-group">
-            <label for="">Number of guests:</label>
-            <input type="number" name="persons" required>
+            <label for="persons">Persons:</label>
+            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>" required>
         </div>
         <div class="form-group">
-            <label for="requests">Special Requests:</label>
-            <textarea name="requests" rows="4" cols="50"></textarea>
+            <label for="requests">Requests:</label>
+            <textarea id="requests" name="requests" rows="4" cols="50"><?php echo $row['requests']; ?></textarea>
         </div>
         <div class="form-group">
-            <button type="submit" name="submit">Book Now</button>
+            <button type="submit" name="update">Update</button>
         </div>
     </form>
 
@@ -37,7 +88,6 @@
     <script>
         // Reserved dates fetched from the server-side
         const reservedDates = <?php
-        include ("Mysqlconnection.php");
         $reservations_result = mysqli_query($connection, "SELECT checkin, checkout FROM reservations");
         $maintenance_result = mysqli_query($connection, "SELECT date FROM maintenance");
 

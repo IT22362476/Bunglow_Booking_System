@@ -14,6 +14,14 @@ $result = mysqli_query($connection, $sql);
 if (!$result) {
     die("Query failed: " . mysqli_error($connection));
 }
+
+// Function to calculate the difference in days between two dates
+function dateDiffInDays($date1, $date2) {
+    $datetime1 = new DateTime($date1);
+    $datetime2 = new DateTime($date2);
+    $interval = $datetime1->diff($datetime2);
+    return $interval->days;
+}
 ?>
 
 <!DOCTYPE html>
@@ -61,6 +69,11 @@ if (!$result) {
         .edit-button {
             background-color: #28a745;
         }
+
+        .disabled-button {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -69,32 +82,47 @@ if (!$result) {
         <table>
             <thead>
                 <tr>
-                    <th>invoicenumber</th>
-                    <th>checkin</th>
-                    <th>checkout</th>
-                    <th>persons</th>
-                    <th>requests</th>
+                    <th>Invoice Number</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Persons</th>
+                    <th>Requests</th>
                     <th>Edit</th>
                     <th>Remove</th>
-                    <th>Bill details</th>
+                    <th>Bill Details</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <?php
+                $currentDate = date('Y-m-d');
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $checkinDate = $row['checkin'];
+                    $daysUntilCheckin = dateDiffInDays($currentDate, $checkinDate);
+                    $isEditableOrDeletable = $daysUntilCheckin >= 14;
+                ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['invoicenumber']); ?></td>
-                        <td><?php echo htmlspecialchars($row['checkin']); ?></td>
+                        <td><?php echo htmlspecialchars($checkinDate); ?></td>
                         <td><?php echo htmlspecialchars($row['checkout']); ?></td>
                         <td><?php echo htmlspecialchars($row['persons']); ?></td>
                         <td><?php echo htmlspecialchars($row['requests']); ?></td>
-                        <td><a href="Reservationupdate.php?id=<?php echo $row['invoicenumber']; ?>"
-                                class="button edit-button">Edit</a></td>
-                        <td><a href="Reservationdelete.php?id=<?php echo $row['invoicenumber']; ?>"
-                                class="button delete-button">Delete</a></td>
-                        <td><a href="Billdetails.php?invoicenumber=<?php echo $row['invoicenumber'];?>"
-                                class="button">Bill Details</a></td>
+                        <td>
+                            <?php if ($isEditableOrDeletable) { ?>
+                                <a href="Reservationupdate.php?id=<?php echo $row['invoicenumber']; ?>" class="button edit-button">Edit</a>
+                            <?php } else { ?>
+                                <span class="button disabled-button">Edit</span>
+                            <?php } ?>
+                        </td>
+                        <td>
+                            <?php if ($isEditableOrDeletable) { ?>
+                                <a href="Reservationdelete.php?id=<?php echo $row['invoicenumber']; ?>" class="button delete-button">Delete</a>
+                            <?php } else { ?>
+                                <span class="button disabled-button">Delete</span>
+                            <?php } ?>
+                        </td>
+                        <td><a href="Billdetails.php?invoicenumber=<?php echo $row['invoicenumber']; ?>" class="button">Bill Details</a></td>
                     </tr>
-                <?php endwhile; ?>
+                <?php } ?>
             </tbody>
         </table>
     </div>

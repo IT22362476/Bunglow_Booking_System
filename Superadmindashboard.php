@@ -42,11 +42,24 @@
         .edit-button {
             background-color: #4CAF50;
         }
+        ul{
+            list-style-type: none;
+            display: flex;
+            gap: 1em;
+        }
+        li a{
+            text-decoration: none;
+            color: black;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <ul>
+            <li><a href="Superadmindashboard.php">Employee Details</a></li>
+            <li><a href="Superadminreservations.php">Reservation Details</a></li>
+        </ul>
         <table>
             <thead>
                 <tr>
