@@ -3,32 +3,49 @@ include ("Mysqlconnection.php");
 if (isset($_POST['submit'])) {
     $EmployeeID = $_POST['EmployeeID'];
     $Guestname = $_POST['Guestname'];
-    $Email = $_POST['Email'];
     $Phone = $_POST['Phone'];
     $Password = $_POST['Password'];
     $cPassword = $_POST['cPassword'];
 
+    // Check if the EmployeeID exists in the executives table
+    $sql_executives = "SELECT Email FROM executives WHERE EmployeeID='$EmployeeID'";
+    $result_executives = mysqli_query($connection, $sql_executives);
+    $count_executives = mysqli_num_rows($result_executives);
 
-$sql = "select * from users where EmployeeID='$EmployeeID'";
-$result = mysqli_query($connection, $sql);
-$count_user = mysqli_num_rows($result);
+    if ($count_executives > 0) { // EmployeeID exists in executives table
+        $row_executives = mysqli_fetch_assoc($result_executives);
+        $Email = $row_executives['Email'];
 
-if ($count_user == 0) {
-    if ($Password == $cPassword) {
-        $hash = password_hash($Password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users(EmployeeID,Guestname,Email,Phone,Password) VALUES('$EmployeeID','$Guestname','$Email','$Phone','$Password')";
-        $result = mysqli_query($connection, $sql);
-        if ($result) {
-            header("Location: Login.php");
+        $sql_users = "SELECT * FROM users WHERE EmployeeID='$EmployeeID'";
+        $result_users = mysqli_query($connection, $sql_users);
+        $count_users = mysqli_num_rows($result_users);
+
+        if ($count_users == 0) {
+            if ($Password == $cPassword) {
+                $sql_insert = "INSERT INTO users(EmployeeID,Guestname,Email,Phone,Password) VALUES('$EmployeeID','$Guestname','$Email','$Phone','$Password')";
+                $result_insert = mysqli_query($connection, $sql_insert);
+                if ($result_insert) {
+                    header("Location: Login.php");
+                } else {
+                    echo "Error: " . mysqli_error($connection);
+                }
+            } else {
+                echo '<script>
+                        window.location.href="Signup.php";
+                        alert("Passwords do not match!");
+                      </script>';
+            }
+        } else {
+            echo '<script>
+                    window.location.href="Signup.php";
+                    alert("EmployeeID already exists!!");
+                  </script>';
         }
-    }
-} else {
-    if ($count_user > 0) {
+    } else {
         echo '<script>
                 window.location.href="Signup.php";
-                alert("EmployeeID already exists!!");
-            </script>';
+                alert("EmployeeID does not defined!! contact administrator ot HR");
+              </script>';
     }
-}
 }
 ?>

@@ -22,10 +22,6 @@
                 <input type="text" name="Guestname" placeholder="Guest name" required><br>
             </div>
             <div class="empInputContainer">
-                <label for="">Email</label>
-                <input type="email" name="Email" placeholder="Email" required><br>
-            </div>
-            <div class="empInputContainer">
                 <label for="">Phone number</label>
                 <input type="phone" name="Phone" placeholder="Phone number" required><br>
             </div>

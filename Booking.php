@@ -35,9 +35,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // Reserved dates fetched from the server-side
         const reservedDates = <?php
-        include ("Mysqlconnection.php");
+        include("Mysqlconnection.php");
         $reservations_result = mysqli_query($connection, "SELECT checkin, checkout FROM reservations");
         $maintenance_result = mysqli_query($connection, "SELECT date FROM maintenance");
 
@@ -73,6 +72,7 @@
 
         function checkBlockedDatesInRange(start, end, blockedDates) {
             let current = new Date(start);
+            current.setDate(current.getDate() + 1); // Start checking from the day after the check-in date
             while (current <= end) {
                 if (blockedDates.includes(current.toISOString().split('T')[0])) {
                     return true;
@@ -88,8 +88,9 @@
             altFormat: "F j, Y",
             allowInput: true,
             minDate: "today",
+            maxDate: new Date().fp_incr(90), // Limit to 90 days from today
             disable: disabledDates,
-            onChange: function(selectedDates, dateStr, instance) {
+            onChange: function (selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
                     const checkinDate = selectedDates[0];
                     const maxCheckoutDate = new Date(checkinDate);
@@ -101,8 +102,8 @@
                         altFormat: "F j, Y",
                         allowInput: true,
                         minDate: dateStr,
-                        maxDate: maxCheckoutDate,
-                        disable: disabledDates.concat([{ from: checkinDate, to: checkinDate }]), // Include the check-in date
+                        maxDate: maxCheckoutDate > new Date().fp_incr(90) ? new Date().fp_incr(90) : maxCheckoutDate,
+                        disable: disabledDates,
                         onChange: function (selectedCheckoutDates, checkoutDateStr, checkoutInstance) {
                             if (selectedCheckoutDates.length > 0) {
                                 const checkoutDate = selectedCheckoutDates[0];
@@ -123,6 +124,7 @@
             altFormat: "F j, Y",
             allowInput: true,
             minDate: "today",
+            maxDate: new Date().fp_incr(90), // Limit to 90 days from today
             disable: disabledDates
         });
     </script>
