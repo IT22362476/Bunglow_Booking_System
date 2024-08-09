@@ -8,6 +8,33 @@ if (!isset($_SESSION['EmployeeID'])) {
 }
 
 $EmployeeID = $_SESSION['EmployeeID'];
+
+// Function to move completed reservations to reservationhistories table and delete them from reservations table
+function moveCompletedReservations($connection, $EmployeeID) {
+    $currentDate = date('Y-m-d');
+
+    // Select reservations with checkout date less than the current date
+    $sql = "SELECT * FROM reservations WHERE checkout < '$currentDate' AND EmployeeID='$EmployeeID'";
+    $result = mysqli_query($connection, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            // Insert into reservationhistories
+            $insertSql = "INSERT INTO reservationhistories (invoicenumber, EmployeeID, checkin, checkout, persons, requests, status)
+                          VALUES ('{$row['invoicenumber']}','{$row['EmployeeID']}, '{$row['checkin']}', '{$row['checkout']}', '{$row['persons']}', '{$row['requests']}', 'Completed', '{$row['EmployeeID']}')";
+            mysqli_query($connection, $insertSql);
+
+            // Delete from reservations
+            $deleteSql = "DELETE FROM reservations WHERE invoicenumber = '{$row['invoicenumber']}'";
+            mysqli_query($connection, $deleteSql);
+        }
+    }
+}
+
+// Call the function to move completed reservations
+moveCompletedReservations($connection, $EmployeeID);
+
+// Retrieve current reservations for the logged-in user
 $sql = "SELECT * FROM reservations WHERE EmployeeID='$EmployeeID'";
 $result = mysqli_query($connection, $sql);
 
@@ -74,11 +101,19 @@ function dateDiffInDays($date1, $date2) {
             background-color: #cccccc;
             cursor: not-allowed;
         }
+        .history {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <a href="Reservationhistory.php" class="history">History</a>
         <table>
             <thead>
                 <tr>

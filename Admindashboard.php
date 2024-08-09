@@ -62,6 +62,7 @@
                 <li class="nav-items"><a href="/Banglow/Admindashboard.php">Users list</a></li>
                 <li class="nav-items"><a href="/Banglow/Calendaradmin.php">Calendar</a></li>
                 <li class="nav-items"><a href="/Banglow/Blocked.php">Blocked Days</a></li>
+                <li class="nav-items"><a href="/Banglow/Adminreservations.php">reservations</a></li>
             </ul>
         </nav>
         <table>
