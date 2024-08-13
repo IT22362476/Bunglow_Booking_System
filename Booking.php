@@ -107,6 +107,14 @@
                         onChange: function (selectedCheckoutDates, checkoutDateStr, checkoutInstance) {
                             if (selectedCheckoutDates.length > 0) {
                                 const checkoutDate = selectedCheckoutDates[0];
+
+                                // Check if check-in and check-out dates are the same
+                                if (checkinDate.toISOString().split('T')[0] === checkoutDate.toISOString().split('T')[0]) {
+                                    alert("Check-in and check-out dates cannot be the same. Please select different dates.");
+                                    checkoutInstance.clear(); // Clear the checkout date if they are the same
+                                    return;
+                                }
+
                                 if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
                                     alert("There are blocked dates within the selected check-in and check-out dates. Please select different dates.");
                                     checkoutInstance.clear();
@@ -129,4 +137,5 @@
         });
     </script>
 </body>
+
 </html>

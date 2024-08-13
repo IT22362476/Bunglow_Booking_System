@@ -59,6 +59,9 @@
         <ul>
             <li><a href="Superadmindashboard.php">Employee Details</a></li>
             <li><a href="Superadminreservations.php">Reservation Details</a></li>
+            <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
+            <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
+
         </ul>
         <table>
             <thead>

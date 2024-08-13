@@ -59,6 +59,14 @@
             text-decoration: none;
             color: black;
         }
+
+        .member-picture {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -66,23 +74,25 @@
         <table>
             <thead>
                 <tr>
-                    <th>invoicenumber</th>
-                    <th>EmployeeID</th>
-                    <th>checkin</th>
-                    <th>checkout</th>
-                    <th>persons</th>
-                    <th>requests</th>
+                    <th>Invoice Number</th>
+                    <th>Employee ID</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Persons</th>
+                    <th>Requests</th>
                     <th>Bill</th>
+                    <th>Picture</th> <!-- New column for the picture -->
                 </tr>
             </thead>
             <tbody>
                 <?php
                 require 'Mysqlconnection.php'; // Include your database connection file
 
-                // Query to select all data from the users table
-                $sql = "SELECT r.invoicenumber, r.EmployeeID, r.checkin, r.checkout, r.persons, r.requests, b.totalBill 
+                // Query to select all data including the picture from the users table
+                $sql = "SELECT r.invoicenumber, r.EmployeeID, r.checkin, r.checkout, r.persons, r.requests, b.totalBill, u.picture 
                         FROM reservations r
-                        LEFT JOIN bills b ON r.invoicenumber = b.invoicenumber AND r.EmployeeID = b.EmployeeID";
+                        LEFT JOIN bills b ON r.invoicenumber = b.invoicenumber AND r.EmployeeID = b.EmployeeID
+                        LEFT JOIN users u ON r.EmployeeID = u.EmployeeID"; // Join with users table to get the picture
                 $result = mysqli_query($connection, $sql);
 
                 if ($result) {
@@ -95,16 +105,28 @@
                         echo "<td>" . htmlspecialchars($row['checkout']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['persons']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['requests']) . "</td>";
+
+                        // Display bill buttons
                         if (isset($row['totalBill'])) {
                             echo "<td><button class='action-button edit-button' disabled>Calculated</button>";
                             echo "<a href='Updatebill.php?invoicenumber=" . htmlspecialchars($row['invoicenumber']) . "&EmployeeID=" . htmlspecialchars($row['EmployeeID']) . "' class='action-button update-button'>Update</a></td>";
                         } else {
                             echo "<td><a href='Calculatebill.php?invoicenumber=" . htmlspecialchars($row['invoicenumber']) . "&EmployeeID=" . htmlspecialchars($row['EmployeeID']) . "' class='action-button edit-button'>Calculate</a></td>";
                         }
+
+                        // Display picture with a link to open in a new tab
+                        if (!empty($row['picture'])) {
+                            echo "<td><a href='uploads/" . htmlspecialchars($row['picture']) . "' target='_blank'>";
+                            echo "<img src='uploads/" . htmlspecialchars($row['picture']) . "' alt='Member Picture' class='member-picture'>";
+                            echo "</a></td>";
+                        } else {
+                            echo "<td>No picture available</td>";
+                        }
+
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='7'>No data found</td></tr>";
+                    echo "<tr><td colspan='8'>No data found</td></tr>";
                 }
 
                 // Close the database connection

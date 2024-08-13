@@ -41,16 +41,37 @@
         .edit-button {
             background-color: #4CAF50;
         }
-        .nav-list{
+        .nav-list {
             display: flex;
             gap: 3em;
         }
-        .nav-items{
+        .nav-items {
             list-style-type: none;
         }
-        .nav-items a{
+        .nav-items a {
             text-decoration: none;
             color: black;
+        }
+        .Addbtn {
+            display: flex;
+            justify-content: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .Addbtn a {
+            text-decoration: none;
+            color: white;
+        }
+        .member-picture {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -62,7 +83,7 @@
                 <li class="nav-items"><a href="/Banglow/Admindashboard.php">Users list</a></li>
                 <li class="nav-items"><a href="/Banglow/Calendaradmin.php">Calendar</a></li>
                 <li class="nav-items"><a href="/Banglow/Blocked.php">Blocked Days</a></li>
-                <li class="nav-items"><a href="/Banglow/Adminreservations.php">reservations</a></li>
+                <li class="nav-items"><a href="/Banglow/Adminreservations.php">Reservations</a></li>
             </ul>
         </nav>
         <table>
@@ -73,6 +94,7 @@
                     <th>Guestname</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Picture</th> <!-- New column for the picture -->
                     <th>Remove</th>
                 </tr>
             </thead>
@@ -80,8 +102,8 @@
                 <?php
                 require 'Mysqlconnection.php'; // Include your database connection file
                 
-                // Query to select all data from the users table
-                $sql = "SELECT UserID, EmployeeID, Guestname, Email, Phone FROM users";
+                // Query to select all data including the picture from the users table
+                $sql = "SELECT UserID, EmployeeID, Guestname, Email, Phone, picture FROM users";
                 $result = mysqli_query($connection, $sql);
 
                 if ($result) {
@@ -93,17 +115,29 @@
                         echo "<td>" . htmlspecialchars($row['Guestname']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Email']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Phone']) . "</td>";
+
+                        // Display picture with a link to open in a new tab
+                        if (!empty($row['picture'])) {
+                            echo "<td><a href='uploads/" . htmlspecialchars($row['picture']) . "' target='_blank'>";
+                            echo "<img src='uploads/" . htmlspecialchars($row['picture']) . "' alt='Member Picture' class='member-picture'>";
+                            echo "</a></td>";
+                        } else {
+                            echo "<td>No picture available</td>";
+                        }
+
                         echo "<td><a href='Userdelete.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button delete-button'>Delete</a></td>";
                         echo "</tr>";
                     }
                 } else {
                     echo "<tr><td colspan='7'>No data found</td></tr>";
                 }
+
                 // Close the database connection
                 mysqli_close($connection);
                 ?>
             </tbody>
         </table>
+        <button class="Addbtn"><a href="Addmembers.php">Add Member</a></button>
     </div>
 </body>
 </html>
