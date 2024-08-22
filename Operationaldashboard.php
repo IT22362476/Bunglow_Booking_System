@@ -81,7 +81,7 @@
                     <th>Persons</th>
                     <th>Requests</th>
                     <th>Bill</th>
-                    <th>Picture</th> <!-- New column for the picture -->
+                    <th>Picture</th>
                 </tr>
             </thead>
             <tbody>

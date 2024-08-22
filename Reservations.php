@@ -21,7 +21,7 @@ function moveCompletedReservations($connection, $EmployeeID) {
         while ($row = mysqli_fetch_assoc($result)) {
             // Insert into reservationhistories
             $insertSql = "INSERT INTO reservationhistories (invoicenumber, EmployeeID, checkin, checkout, persons, requests, status)
-                          VALUES ('{$row['invoicenumber']}','{$row['EmployeeID']}, '{$row['checkin']}', '{$row['checkout']}', '{$row['persons']}', '{$row['requests']}', 'Completed', '{$row['EmployeeID']}')";
+                          VALUES ('{$row['invoicenumber']}', '{$row['EmployeeID']}', '{$row['checkin']}', '{$row['checkout']}', '{$row['persons']}', '{$row['requests']}', 'Completed')";
             mysqli_query($connection, $insertSql);
 
             // Delete from reservations
@@ -162,5 +162,4 @@ function dateDiffInDays($date1, $date2) {
         </table>
     </div>
 </body>
-
 </html>

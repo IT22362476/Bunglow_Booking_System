@@ -32,7 +32,7 @@ if (isset($_GET['id'])) {
         die("Error moving record to history: " . mysqli_error($connection));
     }
 } else {
-    header("Location: reservations.php");
+    header("Location: Reservations.php");
     exit();
 }
 ?>

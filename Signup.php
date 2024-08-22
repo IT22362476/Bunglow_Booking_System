@@ -31,7 +31,7 @@
             </div>
             <div class="empInputContainer">
                 <label for="">Confirm Password</label>
-                <input type="text" name="cPassword" placeholder="*********" required><br>
+                <input type="password" name="cPassword" placeholder="*********" required><br>
             </div>
             <div class="btnContainer">
                 <button type="submit" name="submit">Signup</button>

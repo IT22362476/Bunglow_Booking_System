@@ -23,7 +23,7 @@ function sendReservationEmail($to, $subject, $body) {
     $mail->SMTPSecure = 'ssl';
     $mail->Port = 465;
 
-    $mail->setFrom('denuwansathsara0412@gmail.com', 'Denuwan'); // Replace with your email and name
+    $mail->setFrom('denuwansathsara0412@gmail.com', 'Denuwan');  
     $mail->addAddress($to);
 
     $mail->isHTML(true);
@@ -59,7 +59,7 @@ if (isset($_POST['submit'])) {
                 break;
             }
         }
-
+        
         if ($isAvailable) {
             // Retrieve the EmployeeID from the session
             if (isset($_SESSION['EmployeeID'])) {

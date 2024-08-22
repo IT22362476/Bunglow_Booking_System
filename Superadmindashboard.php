@@ -61,6 +61,8 @@
             <li><a href="Superadminreservations.php">Reservation Details</a></li>
             <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
             <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
+            <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
+            <li class="nav-items"><a href="Executives.php">Executives</a></li>
 
         </ul>
         <table>

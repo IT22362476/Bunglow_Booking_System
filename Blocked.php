@@ -78,13 +78,13 @@ if (!$result) {
 
 <body>
     <div class="container">
-        <nav>
+        <!-- <nav>
             <ul class="nav-list">
                 <li class="nav-items"><a href="/Banglow/Admindashboard.php">Users list</a></li>
                 <li class="nav-items"><a href="/Banglow/Calendaradmin.php">Calendar</a></li>
                 <li class="nav-items"><a href="/Banglow/Blocked.php">Blocked Days</a></li>
             </ul>
-        </nav>
+        </nav> -->
         <table>
             <thead>
                 <tr>

@@ -80,10 +80,12 @@
     <div class="container">
         <nav>
             <ul class="nav-list">
-                <li class="nav-items"><a href="/Banglow/Admindashboard.php">Users list</a></li>
-                <li class="nav-items"><a href="/Banglow/Calendaradmin.php">Calendar</a></li>
-                <li class="nav-items"><a href="/Banglow/Blocked.php">Blocked Days</a></li>
-                <li class="nav-items"><a href="/Banglow/Adminreservations.php">Reservations</a></li>
+                <li class="nav-items"><a href="Admindashboard.php">Users list</a></li>
+                <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
+                <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
+                <li class="nav-items"><a href="Adminreservations.php">Reservations</a></li>
+                <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
+                <li class="nav-items"><a href="Executives.php">Executives</a></li>
             </ul>
         </nav>
         <table>

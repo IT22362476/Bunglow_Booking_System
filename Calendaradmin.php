@@ -71,13 +71,13 @@ while ($row = mysqli_fetch_assoc($maintenance_result)) {
 </head>
 
 <body>
-    <nav>
+    <!-- <nav>
         <ul class="nav-list">
             <li class="nav-items"><a href="/Banglow/Admindashboard.php">Users list</a></li>
             <li class="nav-items"><a href="/Banglow/Calendaradmin.php">Calendar</a></li>
             <li class="nav-items"><a href="/Banglow/Blocked.php">Blocked Days</a></li>
         </ul>
-    </nav>
+    </nav> -->
     <h2>Admin Calendar</h2>
     <form method="post">
         <div class="form-group">
