@@ -49,6 +49,14 @@ function dateDiffInDays($date1, $date2) {
     $interval = $datetime1->diff($datetime2);
     return $interval->days;
 }
+
+// Function to check if a reservation has reached the maximum update count
+function hasReachedMaxUpdateCount($connection, $invoicenumber) {
+    $sql = "SELECT COUNT(*) as update_count FROM update_logs WHERE invoicenumber='$invoicenumber'";
+    $result = mysqli_query($connection, $sql);
+    $row = mysqli_fetch_assoc($result);
+    return $row['update_count'] >= 1;
+}
 ?>
 
 <!DOCTYPE html>
@@ -134,6 +142,9 @@ function dateDiffInDays($date1, $date2) {
                     $checkinDate = $row['checkin'];
                     $daysUntilCheckin = dateDiffInDays($currentDate, $checkinDate);
                     $isEditableOrDeletable = $daysUntilCheckin >= 14;
+
+                    // Check if the maximum update count is reached
+                    $hasMaxUpdateCount = hasReachedMaxUpdateCount($connection, $row['invoicenumber']);
                 ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['invoicenumber']); ?></td>
@@ -142,7 +153,7 @@ function dateDiffInDays($date1, $date2) {
                         <td><?php echo htmlspecialchars($row['persons']); ?></td>
                         <td><?php echo htmlspecialchars($row['requests']); ?></td>
                         <td>
-                            <?php if ($isEditableOrDeletable) { ?>
+                            <?php if ($isEditableOrDeletable && !$hasMaxUpdateCount) { ?>
                                 <a href="Reservationupdate.php?id=<?php echo $row['invoicenumber']; ?>" class="button edit-button">Edit</a>
                             <?php } else { ?>
                                 <span class="button disabled-button">Edit</span>

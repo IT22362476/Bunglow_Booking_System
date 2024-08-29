@@ -6,11 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
     <link rel="stylesheet" type="text/css" href="css/Signup.css">
-
 </head>
 
 <body>
-    <h1>Signup</h1>
+    <!-- Background Video or Image for iPhones and mobile devices -->
+    <video autoplay muted loop playsinline id="backgroundVideo">
+        <source src="./Videos/BackgroundVideo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Content -->
+    <!-- <h1>Signup</h1> -->
     <div class="addform">
         <form action="Signupbackend.php" method="post">
             <div class="empInputContainer">

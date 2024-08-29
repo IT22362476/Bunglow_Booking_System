@@ -96,10 +96,30 @@ body {
   margin-top: 0.5rem;
 }
 
-/* Ensure links in .part2 have no text decoration */
 .part2 a {
   text-decoration: none;
-  color: inherit; /* To inherit the text color */
+  color: inherit;
+}
+
+/* Styles for Sign In and Sign Up buttons */
+.coverpage-content button {
+  background-color: rgb(33, 109, 43); /* Green background for consistency */
+  color: white; /* White text color */
+  border: none; /* No border */
+  padding: 0.75rem 1.5rem; /* Padding for size */
+  margin: 0.5rem; /* Margin between buttons */
+  border-radius: 10px; /* Rounded corners */
+  font-family: "IBM Plex Sans", sans-serif; /* Consistent font family */
+  font-weight: 500; /* Font weight */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition effect */
+}
+.coverpage-content button a{
+  text-decoration: none;
+  color: white;
+}
+.coverpage-content button:hover {
+  background-color: rgb(28, 90, 36); /* Darker green on hover */
 }
 
 @media screen and (max-width: 468px) {
@@ -122,7 +142,6 @@ body {
   }
 
   .coverpage-content {
-    margin-top: 8rem; /* Adjust margin-top for smaller screens */
+    margin-top: 8rem;
   }
 }
-

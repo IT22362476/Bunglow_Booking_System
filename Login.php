@@ -9,7 +9,16 @@
 </head>
 
 <body>
-    <h1>Login</h1>
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline>
+        <source src="./Videos/BackgroundVideo.mp4" type="video/mp4">
+        <!-- Fallback image for devices that can't play video -->
+        <img src="./Images/FallbackImage.jpg" alt="Background Image">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Content -->
+    <!-- <h1>Login</h1> -->
     <div class="loginform">
         <form action="Loginbackend.php" method="post">
             <div class="empInputContainer">

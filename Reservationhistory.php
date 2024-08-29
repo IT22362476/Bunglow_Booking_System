@@ -2,12 +2,20 @@
 session_start();
 require 'Mysqlconnection.php';
 
-// Assuming EmployeeID is stored in session after user logs in
+// Check if the EmployeeID is set in the session
+if (!isset($_SESSION['EmployeeID'])) {
+    // Redirect to login page if not logged in
+    header("Location: Login.php");
+    exit();
+}
+
+// Retrieve the EmployeeID from the session
 $employeeID = $_SESSION['EmployeeID'];
 
-$sql = "SELECT invoicenumber,EmployeeID, checkin, checkout, persons, requests, status FROM reservationhistories WHERE EmployeeID = ?";
+// Prepare and execute the SQL query to fetch reservation history for the logged-in user
+$sql = "SELECT invoicenumber, checkin, checkout, persons, requests, status FROM reservationhistories WHERE EmployeeID = ?";
 $stmt = $connection->prepare($sql);
-$stmt->bind_param("i", $employeeID);
+$stmt->bind_param("s", $employeeID); // Use 's' for string type parameter
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -47,14 +55,14 @@ $result = $stmt->get_result();
     <?php
     // Fetch data and display it in the table
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             echo "<tr>";
-            echo "<td>" . $row["invoicenumber"] . "</td>";
-            echo "<td>" . $row["checkin"] . "</td>";
-            echo "<td>" . $row["checkout"] . "</td>";
-            echo "<td>" . $row["persons"] . "</td>";
-            echo "<td>" . $row["requests"] . "</td>";
-            echo "<td>" . $row["status"] . "</td>";
+            echo "<td>" . htmlspecialchars($row["invoicenumber"]) . "</td>";
+            echo "<td>" . htmlspecialchars($row["checkin"]) . "</td>";
+            echo "<td>" . htmlspecialchars($row["checkout"]) . "</td>";
+            echo "<td>" . htmlspecialchars($row["persons"]) . "</td>";
+            echo "<td>" . htmlspecialchars($row["requests"]) . "</td>";
+            echo "<td>" . htmlspecialchars($row["status"]) . "</td>";
             echo "</tr>";
         }
     } else {

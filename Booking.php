@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // User is not logged in, redirect to Login.php
+    header("Location: /Banglow/Login.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,7 +32,7 @@
             <input type="text" id="checkout" name="checkout" required>
         </div>
         <div class="form-group">
-            <label for="">Number of guests:</label>
+            <label for="persons">Number of guests:</label>
             <input type="number" name="persons" required>
         </div>
         <div class="form-group">
@@ -35,6 +46,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        // Sample JavaScript logic for managing date selection
         const reservedDates = <?php
         include("Mysqlconnection.php");
         $reservations_result = mysqli_query($connection, "SELECT checkin, checkout FROM reservations");

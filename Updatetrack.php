@@ -11,8 +11,8 @@ if (!isset($_SESSION['EmployeeID'])) {
     exit();
 }
 
-// Retrieve update logs from the database, format update_date to only show time
-$query = "SELECT EmployeeID, invoicenumber, update_count, DATE_FORMAT(update_date, '%H:%i:%s') as update_time FROM update_logs";
+// Retrieve update logs from the database, format update_date to YYYY-MM-DD
+$query = "SELECT EmployeeID, invoicenumber, update_count, DATE_FORMAT(update_date, '%Y-%m-%d') as update_date FROM update_logs";
 $result = $connection->query($query);
 
 ?>
@@ -34,7 +34,7 @@ $result = $connection->query($query);
                     <th>Employee ID</th>
                     <th>Invoice Number</th>
                     <th>Update Count</th>
-                    <th>Update Time</th>
+                    <th>Update Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,18 +44,18 @@ $result = $connection->query($query);
                     // Loop through the result and display the records
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
-                        echo "<td>" . $row['EmployeeID'] . "</td>";
-                        echo "<td>" . $row['invoicenumber'] . "</td>";
-                        echo "<td>" . $row['update_count'] . "</td>";
-                        echo "<td>" . $row['update_time'] . "</td>";
+                        echo "<td>" . htmlspecialchars($row['EmployeeID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['invoicenumber']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['update_count']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['update_date']) . "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No update logs found</td></tr>";
+                    echo "<tr><td colspan='4'>No update logs found</td></tr>";
                 }
                 ?>
             </tbody>
         </table>
     </div>
 </body>
-</html> 
+</html>

@@ -81,15 +81,15 @@ if (isset($_POST['update'])) {
     <form class="booking-form" method="post">
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" value="<?php echo htmlspecialchars($row['checkin']); ?>" required>
+            <input type="text" id="checkin" name="checkin" value="<?php echo htmlspecialchars($row['checkin']); ?>" >
         </div>
         <div class="form-group">
             <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" value="<?php echo htmlspecialchars($row['checkout']); ?>" required>
+            <input type="text" id="checkout" name="checkout" value="<?php echo htmlspecialchars($row['checkout']); ?>" >
         </div>
         <div class="form-group">
             <label for="persons">Number of guests:</label>
-            <input type="number" id="persons" name="persons" value="<?php echo htmlspecialchars($row['persons']); ?>" required>
+            <input type="number" id="persons" name="persons" value="<?php echo htmlspecialchars($row['persons']); ?>" >
         </div>
         <div class="form-group">
             <label for="requests">Special Requests:</label>

@@ -21,8 +21,12 @@ if (isset($_POST['EmployeeID']) && isset($_POST['Password'])) {
         header("Location: Login.php?error=Password is required");
         exit();
     } else {
-        $sql = "SELECT * FROM users WHERE EmployeeID='$EmployeeID' AND Password='$Password'";
-        $result = mysqli_query($connection, $sql);
+        // Use prepared statements to prevent SQL injection
+        $sql = "SELECT * FROM users WHERE EmployeeID = ? AND Password = ?";
+        $stmt = mysqli_prepare($connection, $sql);
+        mysqli_stmt_bind_param($stmt, "ss", $EmployeeID, $Password);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
         if (!$result) {
             die("Query failed: " . mysqli_error($connection));
@@ -33,16 +37,17 @@ if (isset($_POST['EmployeeID']) && isset($_POST['Password'])) {
             if ($row['EmployeeID'] === $EmployeeID && $row['Password'] === $Password) {
                 $_SESSION['UserID'] = $row['UserID'];
                 $_SESSION['EmployeeID'] = $row['EmployeeID'];
+                $_SESSION['loggedin'] = true; // Set the logged-in session variable
 
+                // Redirect based on the user role
                 if ($EmployeeID === 'SuperAdmin') {
                     header("Location: Superadmindashboard.php");
-                }else if ($EmployeeID === 'Admin') {
+                } else if ($EmployeeID === 'Admin') {
                     header("Location: Admindashboard.php");
-                }else if ($EmployeeID === 'Operational') {
+                } else if ($EmployeeID === 'Operational') {
                     header("Location: Operationaldashboard.php");
-                } 
-                else{
-                    header("Location: Home.php");
+                } else {
+                    header("Location: index.php");
                 }
                 exit();
             } else {

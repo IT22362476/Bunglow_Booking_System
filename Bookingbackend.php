@@ -96,12 +96,12 @@ if (isset($_POST['submit'])) {
                         if (sendReservationEmail($userEmail, $subject, $body)) {
                             echo '<script>
                                     alert("Booking successful! Confirmation email sent.");
-                                    window.location.href="Home.php";
+                                    window.location.href="index.php";
                                 </script>';
                         } else {
                             echo '<script>
                                     alert("Booking successful, but failed to send confirmation email.");
-                                    window.location.href="Home.php";
+                                    window.location.href="index.php";
                                 </script>';
                         }
                     } else {
