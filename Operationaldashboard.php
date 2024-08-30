@@ -5,52 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        /* General styling for the table */
         table {
             width: 100%;
             border-collapse: collapse;
+            border: 2px solid #4CAF50; /* Green border for the table */
+            border-radius: 8px; /* Border radius for rounded corners */
+            overflow: hidden; /* Ensures rounded corners are visible */
         }
 
-        th,
-        td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-
+        /* Styling for table headers */
         th {
-            background-color: #f2f2f2;
+            background-color: #4CAF50; /* Green background for headers */
+            color: white; /* White text color for headers */
+            padding: 12px; /* Padding for headers */
         }
 
+        /* Styling for table data cells */
+        td {
+            border: 1px solid #4CAF50; /* Green border for cells */
+            padding: 10px; /* Padding for cells */
+            text-align: left; /* Align text to the left */
+        }
+
+        /* Alternating row colors for the table */
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #e8f5e9; /* Light green for even rows */
         }
 
+        tr:nth-child(odd) {
+            background-color: #f9f9f9; /* Light grey for odd rows */
+        }
+
+        /* Styling for action buttons */
         .action-button {
             cursor: pointer;
             text-decoration: none;
-            padding: 0.4em;
+            padding: 0.4em 0.8em; /* Increased padding for better spacing */
             border: solid 1px black;
             border-radius: 0.5em;
-            color: #f9f9f9;
+            color: white; /* White text color for buttons */
+            display: inline-block; /* Ensures buttons have spacing */
+            margin-top: 5px; /* Space between buttons */
         }
 
+        /* Specific styling for different button types */
         .delete-button {
-            background-color: #ed4239;
+            background-color: #ed4239; /* Red for delete buttons */
         }
 
         .edit-button {
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* Green for edit buttons */
         }
 
         .update-button {
-            background-color: #FFA500;
+            background-color: #FFA500; /* Orange for update buttons */
         }
 
+        /* Styling for navigation list */
         .nav-list {
             display: flex;
             gap: 3em;
         }
 
+        /* Styling for navigation items */
         .nav-items {
             list-style-type: none;
         }
@@ -60,6 +78,7 @@
             color: black;
         }
 
+        /* Styling for member picture */
         .member-picture {
             width: 50px;
             height: 50px;
@@ -108,7 +127,7 @@
 
                         // Display bill buttons
                         if (isset($row['totalBill'])) {
-                            echo "<td><button class='action-button edit-button' disabled>Calculated</button>";
+                            echo "<td><button class='action-button edit-button' disabled>Calculated</button><br/>";
                             echo "<a href='Updatebill.php?invoicenumber=" . htmlspecialchars($row['invoicenumber']) . "&EmployeeID=" . htmlspecialchars($row['EmployeeID']) . "' class='action-button update-button'>Update</a></td>";
                         } else {
                             echo "<td><a href='Calculatebill.php?invoicenumber=" . htmlspecialchars($row['invoicenumber']) . "&EmployeeID=" . htmlspecialchars($row['EmployeeID']) . "' class='action-button edit-button'>Calculate</a></td>";

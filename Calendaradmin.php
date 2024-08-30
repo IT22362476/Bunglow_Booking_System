@@ -13,7 +13,7 @@ if (isset($_POST['block_dates']) && !empty($_POST['block_dates'])) {
     $blocked_dates_array = explode(",", $blocked_dates);
 
     foreach ($blocked_dates_array as $blocked_date) {
-        $sql = "INSERT INTO maintenance (date,reason) VALUES ('$blocked_date','$reason') ON DUPLICATE KEY UPDATE date = date";
+        $sql = "INSERT INTO maintenance (date, reason) VALUES ('$blocked_date', '$reason') ON DUPLICATE KEY UPDATE date = date";
         if (!mysqli_query($connection, $sql)) {
             die("Error updating record: " . mysqli_error($connection));
         }
@@ -50,54 +50,167 @@ while ($row = mysqli_fetch_assoc($maintenance_result)) {
     <title>Admin Calendar</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8f5;
+            margin: 0;
+            padding: 0;
+        }
+
         h2 {
             text-align: center;
+            color: #2f8f2f;
             margin-bottom: 20px;
         }
 
-        .nav-list {
+        .form-group {
             display: flex;
-            gap: 3em;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .nav-items {
-            list-style-type: none;
+        form {
+            padding: 1em;
         }
-        .nav-items a {
+
+        .form-container {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        label {
+            color: #2f8f2f;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #2f8f2f;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #228b22;
+        }
+
+        button {
+            background-color: #2f8f2f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #228b22;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #4CAF50; /* Green color for the menu icon */
+            z-index: 1001; /* Ensure the toggle icon is above other content */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #4CAF50; /* Green background for the sidebar */
+            color: white; /* White text color for the sidebar */
+            position: fixed;
+            height: 100%;
+            top: 0;
+            left: -250px; /* Initially hidden */
+            overflow: hidden;
+            transition: left 0.3s; /* Smooth transition for the sidebar */
+            z-index: 1000; /* Ensure sidebar appears above other content */
+        }
+
+        .sidebar.active {
+            left: 0; /* Show the sidebar */
+        }
+
+        .sidebar .nav-list {
+            padding: 20px;
+        }
+
+        .sidebar .nav-items {
+            list-style-type: none;
+            margin: 20px 0;
+        }
+
+        .sidebar .nav-items a {
             text-decoration: none;
-            color: black;
+            color: white;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar .nav-items a:hover {
+            background-color: #45a049; /* Slightly darker green for hover effect */
+        }
+
+        .container {
+            padding: 20px;
+            transition: margin-left 0.3s; /* Smooth transition for margin adjustment */
+            margin-left: 250px; /* Default margin with sidebar visible */
         }
     </style>
 </head>
 
 <body>
-    <!-- <nav>
-        <ul class="nav-list">
-            <li class="nav-items"><a href="/Banglow/Admindashboard.php">Users list</a></li>
-            <li class="nav-items"><a href="/Banglow/Calendaradmin.php">Calendar</a></li>
-            <li class="nav-items"><a href="/Banglow/Blocked.php">Blocked Days</a></li>
-        </ul>
-    </nav> -->
-    <h2>Admin Calendar</h2>
-    <form method="post">
-        <div class="form-group">
-            <label for="block_dates">Select Dates to Block for Maintenance:</label>
-            <input type="text" id="block_dates" name="block_dates"><br /><br />
-            <label for="reason">Reason for Maintenance:</label>
-            <input type="text" id="reason" name="reason">
+    <!-- Menu toggle icon -->
+    <div class="menu-toggle" onclick="toggleSidebar()">&#9776;</div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <nav>
+            <ul class="nav-list">
+                <li class="nav-items"><a href="Admindashboard.php">Users list</a></li>
+                <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
+                <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
+                <li class="nav-items"><a href="Adminreservations.php">Reservations</a></li>
+                <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
+                <li class="nav-items"><a href="Executives.php">Executives</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="main-container">
+        <h2>Admin Calendar</h2>
+        <div class="form-container">
+            <form method="post">
+                <div class="form-group">
+                    <label for="block_dates">Select Dates to Block for Maintenance:</label>
+                    <input type="text" id="block_dates" name="block_dates" placeholder="Select dates">
+                </div>
+                <div class="form-group">
+                    <label for="reason">Reason for Maintenance:</label>
+                    <input type="text" id="reason" name="reason" placeholder="Enter reason">
+                </div>
+                <button type="submit">Block Dates</button>
+            </form>
         </div>
-        <button type="submit">Block Dates</button>
-    </form>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         const reservedDates = <?php echo json_encode($reserved_dates); ?>;
         const blockedDates = <?php echo json_encode($blocked_dates); ?>;
-
-        function isDateInRange(date, range) {
-            const dateTime = date.getTime();
-            return dateTime >= new Date(range.from).getTime() && dateTime <= new Date(range.to).getTime();
-        }
 
         function getDisabledDates(dates) {
             const disabled = [];
@@ -130,6 +243,19 @@ while ($row = mysqli_fetch_assoc($maintenance_result)) {
                 }
             }
         });
+
+        // Function to toggle the sidebar
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var container = document.getElementById("main-container");
+            if (sidebar.classList.contains("active")) {
+                sidebar.classList.remove("active");
+                container.style.marginLeft = "0"; // Use full width when the sidebar is hidden
+            } else {
+                sidebar.classList.add("active");
+                container.style.marginLeft = "250px"; // Adjust the container margin when the sidebar is shown
+            }
+        }
     </script>
 </body>
 

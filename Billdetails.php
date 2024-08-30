@@ -12,7 +12,7 @@ if (!isset($_GET['invoicenumber'])) {
 }
 
 $invoicenumber = $_GET['invoicenumber'];
-$sql = "SELECT roomCharge, linenCharge, otherExpenses, totalBill FROM bills WHERE invoicenumber='$invoicenumber'";
+$sql = "SELECT linenCharge, otherExpenses, totalBill FROM bills WHERE invoicenumber='$invoicenumber'";
 $result = mysqli_query($connection, $sql);
 
 if (!$result) {
@@ -84,10 +84,6 @@ if (!$row) {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Room Charge</td>
-                    <td><?php echo htmlspecialchars($row['roomCharge']); ?></td>
-                </tr>
                 <tr>
                     <td>Linen Charge</td>
                     <td><?php echo htmlspecialchars($row['linenCharge']); ?></td>

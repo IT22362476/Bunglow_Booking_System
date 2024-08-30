@@ -100,24 +100,38 @@
 
             $employee_id = mysqli_real_escape_string($connection, $_POST['employee_id']);
             $email = mysqli_real_escape_string($connection, $_POST['email']);
-            
-            // Handling the picture upload
-            $picture = $_FILES['picture']['name'];
-            $target_dir = "uploads/";
-            $target_file = $target_dir . basename($picture);
 
-            // Check if file was uploaded successfully
-            if (move_uploaded_file($_FILES['picture']['tmp_name'], $target_file)) {
-                // Insert into the database
-                $query = "INSERT INTO executives (EmployeeID, Email, picture) VALUES ('$employee_id', '$email', '$picture')";
+            // Check if the employee ID or email already exists
+            $check_query = "SELECT * FROM executives WHERE EmployeeID = '$employee_id' OR Email = '$email'";
+            $check_result = mysqli_query($connection, $check_query);
 
-                if (mysqli_query($connection, $query)) {
-                    echo '<div class="message">New executive added successfully!</div>';
-                } else {
-                    echo '<div class="error">Error: ' . mysqli_error($connection) . '</div>';
-                }
+            if (mysqli_num_rows($check_result) > 0) {
+                echo '<script>
+                            alert("An executive with this Employee ID or Email already exists.");
+                            window.location.href="Addmembers.php";
+                        </script>';
             } else {
-                echo '<div class="error">Error uploading picture.</div>';
+                // Handling the picture upload
+                $picture = $_FILES['picture']['name'];
+                $target_dir = "uploads/";
+                $target_file = $target_dir . basename($picture);
+
+                // Check if file was uploaded successfully
+                if (move_uploaded_file($_FILES['picture']['tmp_name'], $target_file)) {
+                    // Insert into the database
+                    $query = "INSERT INTO executives (EmployeeID, Email, picture) VALUES ('$employee_id', '$email', '$picture')";
+
+                    if (mysqli_query($connection, $query)) {
+                        echo '<script>
+                                    alert("New executive added successfully!");
+                                    window.location.href="Admindashboard.php";
+                                </script>';
+                    } else {
+                        echo '<div class="error">Error: ' . mysqli_error($connection) . '</div>';
+                    }
+                } else {
+                    echo '<div class="error">Error uploading picture.</div>';
+                }
             }
 
             mysqli_close($connection);

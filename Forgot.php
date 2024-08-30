@@ -7,6 +7,13 @@
     <link rel="stylesheet" type="text/css" href="css/Login.css">
 </head>
 <body>
+        <!-- Background Video -->
+        <video autoplay muted loop playsinline>
+        <source src="./Videos/BackgroundVideo.mp4" type="video/mp4">
+        <!-- Fallback image for devices that can't play video -->
+        <img src="./Images/FallbackImage.jpg" alt="Background Image">
+        Your browser does not support the video tag.
+    </video>
     <h1>Forgot Password</h1>
     <div class="loginform">
         <form action="SendOTP.php" method="post">
