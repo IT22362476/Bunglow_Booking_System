@@ -1,66 +1,97 @@
 <?php
-session_start();
+include("Mysqlconnection.php");
 
-// Check if the user is logged in
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // User is not logged in, redirect to Login.php
-    header("Location: /Banglow/Login.php");
-    exit();
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $query = "SELECT * FROM reservations WHERE invoicenumber = '$id'";
+    $result = mysqli_query($connection, $query);
+    $row = mysqli_fetch_assoc($result);
 }
 
-$timeout_duration = 3600;
+if (isset($_POST['update'])) {
+    $invoicenumber = $_POST['invoicenumber'];
+    $EmployeeID = $_POST['EmployeeID'];
+    $checkin = $_POST['checkin'];
+    $checkout = $_POST['checkout'];
+    $persons = $_POST['persons'];
+    $requests = $_POST['requests'];
 
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
-    // Last activity was over an hour ago
-    session_unset();     // Unset $_SESSION variable
-    session_destroy();   // Destroy session data
-    header("Location: Login.php?timeout=true");
-    exit();
+    // Fetch blocked dates
+    $blocked_dates_query = "SELECT date FROM maintenance";
+    $blocked_dates_result = mysqli_query($connection, $blocked_dates_query);
+    $blocked_dates = [];
+    while ($blocked_row = mysqli_fetch_assoc($blocked_dates_result)) {
+        $blocked_dates[] = $blocked_row['date'];
+    }
+
+    // Check for blocked dates within the check-in and check-out range
+    $blocked_in_range = false;
+    $current_date = strtotime($checkin);
+    $end_date = strtotime($checkout);
+
+    // Skip the check-in date
+    $current_date = strtotime('+1 day', $current_date);
+
+    while ($current_date <= $end_date) {
+        if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
+            $blocked_in_range = true;
+            break;
+        }
+        $current_date = strtotime('+1 day', $current_date);
+    }
+
+    if ($blocked_in_range) {
+        echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
+    } else {
+        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+        mysqli_query($connection, $query);
+        header("Location: Adminreservations.php");
+    }
 }
-
-$_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Form</title>
+    <title>Edit Reservation</title>
     <link rel="stylesheet" type="text/css" href="css/Booking.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
-
 <body>
-    <form action="Bookingbackend.php" method="post" class="booking-form">
-        <h2>Book Your Stay</h2>
+    <h2>Edit Reservation</h2>
+    <form action="Admineditreservations.php?id=<?php echo $row['invoicenumber']; ?>" method="post" class="booking-form">
+        <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
+        <div class="form-group">
+            <label for="EmployeeID">Employee ID:</label>
+            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
+        </div>
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" required>
+            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>">
         </div>
         <div class="form-group">
             <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" required>
+            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>">
         </div>
         <div class="form-group">
-            <label for="persons">Number of guests:</label>
-            <input type="number" name="persons" required>
+            <label for="persons">Persons:</label>
+            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>">
         </div>
         <div class="form-group">
-            <label for="requests">Special Requests:</label>
-            <textarea name="requests" rows="4" cols="50"></textarea>
+            <label for="requests">Requests:</label>
+            <textarea id="requests" name="requests" rows="4" cols="50"><?php echo $row['requests']; ?></textarea>
         </div>
         <div class="form-group">
-            <button type="submit" name="submit">Book Now</button>
+            <button type="submit" name="update">Update</button>
         </div>
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // Sample JavaScript logic for managing date selection
+        // Reserved dates fetched from the server-side
         const reservedDates = <?php
-        include("Mysqlconnection.php");
         $reservations_result = mysqli_query($connection, "SELECT checkin, checkout FROM reservations");
         $maintenance_result = mysqli_query($connection, "SELECT date FROM maintenance");
 
@@ -112,7 +143,6 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
             altFormat: "F j, Y",
             allowInput: true,
             minDate: "today",
-            maxDate: new Date().fp_incr(90), // Limit to 90 days from today
             disable: disabledDates,
             onChange: function (selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
@@ -120,46 +150,38 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
                     const maxCheckoutDate = new Date(checkinDate);
                     maxCheckoutDate.setDate(maxCheckoutDate.getDate() + 7); // Add 7 days
 
-                    const checkoutPicker = flatpickr("#checkout", {
+                    // Re-initialize checkout flatpickr with updated date range
+                    flatpickr("#checkout", {
                         dateFormat: "Y-m-d",
                         altInput: true,
                         altFormat: "F j, Y",
                         allowInput: true,
                         minDate: dateStr,
-                        maxDate: maxCheckoutDate > new Date().fp_incr(90) ? new Date().fp_incr(90) : maxCheckoutDate,
-                        disable: disabledDates,
+                        maxDate: maxCheckoutDate,
+                        disable: disabledDates, // Only apply the initially blocked dates, not the entire check-in range
                         onChange: function (selectedCheckoutDates, checkoutDateStr, checkoutInstance) {
                             if (selectedCheckoutDates.length > 0) {
                                 const checkoutDate = selectedCheckoutDates[0];
-
-                                // Check if check-in and check-out dates are the same
-                                if (checkinDate.toISOString().split('T')[0] === checkoutDate.toISOString().split('T')[0]) {
-                                    alert("Check-in and check-out dates cannot be the same. Please select different dates.");
-                                    checkoutInstance.clear(); // Clear the checkout date if they are the same
-                                    return;
-                                }
-
                                 if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
                                     alert("There are blocked dates within the selected check-in and check-out dates. Please select different dates.");
                                     checkoutInstance.clear();
                                 }
                             }
                         }
-                    });
+                    }).clear(); // Ensure the field is cleared on re-initialization
                 }
             }
         });
 
+        // Initialize the checkout field with basic settings initially
         flatpickr("#checkout", {
             dateFormat: "Y-m-d",
             altInput: true,
             altFormat: "F j, Y",
             allowInput: true,
             minDate: "today",
-            maxDate: new Date().fp_incr(90), // Limit to 90 days from today
             disable: disabledDates
         });
     </script>
 </body>
-
 </html>

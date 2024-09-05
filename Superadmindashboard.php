@@ -155,10 +155,10 @@
             <ul class="nav-list">
                 <li class="nav-items"><a href="Superadmindashboard.php">Employee Details</a></li>
                 <li class="nav-items"><a href="Superadminreservations.php">Reservation Details</a></li>
-                <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
-                <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
-                <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
-                <li class="nav-items"><a href="Executives.php">Executives</a></li>
+                <li class="nav-items"><a href="Supercalendaradmin.php">Calendar</a></li>
+                <li class="nav-items"><a href="Superblocked.php">Blocked Days</a></li>
+                <li class="nav-items"><a href="Superupdatetrack.php">Update Tracker</a></li>
+                <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
             </ul>
         </nav>
     </div>
@@ -195,7 +195,7 @@
                         echo "<td>" . htmlspecialchars($row['Email']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Phone']) . "</td>";
                         echo "<td><a href='Userupdate.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button edit-button'>Edit</a></td>";
-                        echo "<td><a href='Userdelete.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button delete-button'>Delete</a></td>";
+                        echo "<td><a href='Superuserdelete.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button delete-button'>Delete</a></td>";
                         echo "</tr>";
                     }
                 } else {

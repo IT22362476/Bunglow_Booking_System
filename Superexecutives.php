@@ -163,12 +163,12 @@ if (!$result) {
     <div class="sidebar" id="sidebar">
         <nav>
             <ul class="nav-list">
-                <li class="nav-items"><a href="Admindashboard.php">Users list</a></li>
-                <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
-                <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
-                <li class="nav-items"><a href="Adminreservations.php">Reservations</a></li>
-                <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
-                <li class="nav-items"><a href="Executives.php">Executives</a></li>
+                <li class="nav-items"><a href="Superadmindashboard.php">Employee Details</a></li>
+                <li class="nav-items"><a href="Superadminreservations.php">Reservation Details</a></li>
+                <li class="nav-items"><a href="Supercalendaradmin.php">Calendar</a></li>
+                <li class="nav-items"><a href="Superblocked.php">Blocked Days</a></li>
+                <li class="nav-items"><a href="Superupdatetrack.php">Update Tracker</a></li>
+                <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
             </ul>
         </nav>
     </div>

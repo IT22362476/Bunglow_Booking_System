@@ -175,8 +175,8 @@ $result = mysqli_query($connection, $query);
                     <td><?php echo htmlspecialchars($row['checkout']); ?></td>
                     <td><?php echo htmlspecialchars($row['persons']); ?></td>
                     <td><?php echo htmlspecialchars($row['requests']); ?></td>
-                    <td><a href="Sadmineditreservations.php?id=<?php echo htmlspecialchars($row['invoicenumber']); ?>" class="edit-btn">Edit</a></td>
-                    <td><a href="Sadminremovereservations.php?id=<?php echo htmlspecialchars($row['invoicenumber']); ?>" class="remove-btn">Delete</a></td>
+                    <td><a href="Admineditreservations.php?id=<?php echo htmlspecialchars($row['invoicenumber']); ?>" class="edit-btn">Edit</a></td>
+                    <td><a href="Adminreservationdelete.php?id=<?php echo htmlspecialchars($row['invoicenumber']); ?>" class="remove-btn">Delete</a></td>
                 </tr>
             <?php } ?>
         </table>

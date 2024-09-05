@@ -28,6 +28,10 @@ if (isset($_POST['update'])) {
     $blocked_in_range = false;
     $current_date = strtotime($checkin);
     $end_date = strtotime($checkout);
+
+    // Skip the check-in date
+    $current_date = strtotime('+1 day', $current_date);
+
     while ($current_date <= $end_date) {
         if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
             $blocked_in_range = true;
@@ -61,19 +65,19 @@ if (isset($_POST['update'])) {
         <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
         <div class="form-group">
             <label for="EmployeeID">Employee ID:</label>
-            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>" >
+            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
         </div>
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>" >
+            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>">
         </div>
         <div class="form-group">
             <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>" >
+            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>">
         </div>
         <div class="form-group">
             <label for="persons">Persons:</label>
-            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>" >
+            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>">
         </div>
         <div class="form-group">
             <label for="requests">Requests:</label>
@@ -123,6 +127,7 @@ if (isset($_POST['update'])) {
 
         function checkBlockedDatesInRange(start, end, blockedDates) {
             let current = new Date(start);
+            current.setDate(current.getDate() + 1); // Start checking from the day after the check-in date
             while (current <= end) {
                 if (blockedDates.includes(current.toISOString().split('T')[0])) {
                     return true;
@@ -139,20 +144,21 @@ if (isset($_POST['update'])) {
             allowInput: true,
             minDate: "today",
             disable: disabledDates,
-            onChange: function(selectedDates, dateStr, instance) {
+            onChange: function (selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
                     const checkinDate = selectedDates[0];
                     const maxCheckoutDate = new Date(checkinDate);
                     maxCheckoutDate.setDate(maxCheckoutDate.getDate() + 7); // Add 7 days
 
-                    const checkoutPicker = flatpickr("#checkout", {
+                    // Re-initialize checkout flatpickr with updated date range
+                    flatpickr("#checkout", {
                         dateFormat: "Y-m-d",
                         altInput: true,
                         altFormat: "F j, Y",
                         allowInput: true,
                         minDate: dateStr,
                         maxDate: maxCheckoutDate,
-                        disable: disabledDates.concat([{ from: checkinDate, to: checkinDate }]), // Include the check-in date
+                        disable: disabledDates, // Only apply the initially blocked dates, not the entire check-in range
                         onChange: function (selectedCheckoutDates, checkoutDateStr, checkoutInstance) {
                             if (selectedCheckoutDates.length > 0) {
                                 const checkoutDate = selectedCheckoutDates[0];
@@ -162,11 +168,12 @@ if (isset($_POST['update'])) {
                                 }
                             }
                         }
-                    });
+                    }).clear(); // Ensure the field is cleared on re-initialization
                 }
             }
         });
 
+        // Initialize the checkout field with basic settings initially
         flatpickr("#checkout", {
             dateFormat: "Y-m-d",
             altInput: true,

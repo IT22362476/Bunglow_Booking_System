@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+// If the session timeout error is set, display a message
+$timeoutMessage = '';
+if (isset($_GET['timeout']) && $_GET['timeout'] == 'true') {
+    $timeoutMessage = 'Your session has expired due to inactivity. Please log in again.';
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,8 +28,11 @@
     </video>
 
     <!-- Content -->
-    <!-- <h1>Login</h1> -->
     <div class="loginform">
+        <?php if ($timeoutMessage): ?>
+            <p style="color: red; text-align: center;"><?php echo $timeoutMessage; ?></p>
+        <?php endif; ?>
+        
         <form action="Loginbackend.php" method="post">
             <div class="empInputContainer">
                 <label for="">Employee ID</label>

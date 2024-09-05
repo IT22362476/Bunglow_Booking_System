@@ -10,7 +10,8 @@ if (!isset($_SESSION['EmployeeID'])) {
 $EmployeeID = $_SESSION['EmployeeID'];
 
 // Function to move completed reservations to reservationhistories table and delete them from reservations table
-function moveCompletedReservations($connection, $EmployeeID) {
+function moveCompletedReservations($connection, $EmployeeID)
+{
     $currentDate = date('Y-m-d');
 
     // Select reservations with checkout date less than the current date
@@ -43,7 +44,8 @@ if (!$result) {
 }
 
 // Function to calculate the difference in days between two dates
-function dateDiffInDays($date1, $date2) {
+function dateDiffInDays($date1, $date2)
+{
     $datetime1 = new DateTime($date1);
     $datetime2 = new DateTime($date2);
     $interval = $datetime1->diff($datetime2);
@@ -51,7 +53,8 @@ function dateDiffInDays($date1, $date2) {
 }
 
 // Function to check if a reservation has reached the maximum update count
-function hasReachedMaxUpdateCount($connection, $invoicenumber) {
+function hasReachedMaxUpdateCount($connection, $invoicenumber)
+{
     $sql = "SELECT COUNT(*) as update_count FROM update_logs WHERE invoicenumber='$invoicenumber'";
     $result = mysqli_query($connection, $sql);
     $row = mysqli_fetch_assoc($result);
@@ -67,34 +70,105 @@ function hasReachedMaxUpdateCount($connection, $invoicenumber) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservation Details</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
         }
 
-        th,
-        td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+        .container {
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #4CAF50;
+            color: white;
+            position: fixed;
+            height: 100%;
+            top: 0;
+            left: -250px;
+            overflow: hidden;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar .nav-list {
+            padding: 20px;
+        }
+
+        .sidebar .nav-items {
+            list-style-type: none;
+            margin: 20px 0;
+        }
+
+        .sidebar .nav-items a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar .nav-items a:hover {
+            background-color: #45a049;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #235428;
+            z-index: 1001;
+        }
+
+        table {
+            margin-left: 1em;
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            border: 1px solid #4CAF50;
+            padding: 10px;
+            text-align: left;
         }
 
         tr:nth-child(even) {
+            background-color: #e8f5e9;
+        }
+
+        tr:nth-child(odd) {
             background-color: #f9f9f9;
         }
 
-        .button {
+        .action-button {
             cursor: pointer;
             text-decoration: none;
-            background-color: #007bff;
-            padding: 0.4em;
+            padding: 0.4em 0.8em;
             border: solid 1px black;
             border-radius: 0.5em;
-            color: #f9f9f9;
+            color:black;
+            display: inline-block;
+            margin-top: 5px;
         }
 
         .delete-button {
@@ -102,26 +176,44 @@ function hasReachedMaxUpdateCount($connection, $invoicenumber) {
         }
 
         .edit-button {
-            background-color: #28a745;
+            background-color: #4CAF50;
         }
 
         .disabled-button {
             background-color: #cccccc;
             cursor: not-allowed;
         }
-        .history {
-            text-decoration: none;
-            color: black;
-            font-weight: bold;
-            margin-bottom: 15px;
+
+        .Addbtn {
             display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 20px auto;
+            width: fit-content;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <a href="Reservationhistory.php" class="history">History</a>
+    <div class="menu-toggle" onclick="toggleSidebar()">&#9776;</div>
+
+    <div class="sidebar" id="sidebar">
+        <nav>
+            <ul class="nav-list">
+                <li class="nav-items"> <a href="Reservationhistory.php" class="history">History</a>
+                <li class="nav-items"> <a href="Reservations.php" class="history">Reservations</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="container" id="main-container">
         <table>
             <thead>
                 <tr>
@@ -145,7 +237,7 @@ function hasReachedMaxUpdateCount($connection, $invoicenumber) {
 
                     // Check if the maximum update count is reached
                     $hasMaxUpdateCount = hasReachedMaxUpdateCount($connection, $row['invoicenumber']);
-                ?>
+                    ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['invoicenumber']); ?></td>
                         <td><?php echo htmlspecialchars($checkinDate); ?></td>
@@ -154,23 +246,41 @@ function hasReachedMaxUpdateCount($connection, $invoicenumber) {
                         <td><?php echo htmlspecialchars($row['requests']); ?></td>
                         <td>
                             <?php if ($isEditableOrDeletable && !$hasMaxUpdateCount) { ?>
-                                <a href="Reservationupdate.php?id=<?php echo $row['invoicenumber']; ?>" class="button edit-button">Edit</a>
+                                <a href="Reservationupdate.php?id=<?php echo $row['invoicenumber']; ?>"
+                                    class="action-button edit-button">Edit</a>
                             <?php } else { ?>
-                                <span class="button disabled-button">Edit</span>
+                                <span class="action-button disabled-button">Edit</span>
                             <?php } ?>
                         </td>
                         <td>
                             <?php if ($isEditableOrDeletable) { ?>
-                                <a href="Reservationdelete.php?id=<?php echo $row['invoicenumber']; ?>" class="button delete-button">Delete</a>
+                                <a href="Reservationdelete.php?id=<?php echo $row['invoicenumber']; ?>"
+                                    class="action-button delete-button">Delete</a>
                             <?php } else { ?>
-                                <span class="button disabled-button">Delete</span>
+                                <span class="action-button disabled-button">Delete</span>
                             <?php } ?>
                         </td>
-                        <td><a href="Billdetails.php?invoicenumber=<?php echo $row['invoicenumber']; ?>" class="button">Bill Details</a></td>
+                        <td><a href="Billdetails.php?invoicenumber=<?php echo $row['invoicenumber']; ?>"
+                                class="action-button">Bill Details</a></td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var container = document.getElementById("main-container");
+            if (sidebar.style.left === "-250px") {
+                sidebar.style.left = "0";
+                container.style.marginLeft = "250px";
+            } else {
+                sidebar.style.left = "-250px";
+                container.style.marginLeft = "0";
+            }
+        }
+    </script>
 </body>
+
 </html>
