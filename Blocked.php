@@ -2,6 +2,18 @@
 session_start();
 require 'Mysqlconnection.php'; // Include your MySQL connection file
 
+// Check if the delete request is sent
+if (isset($_POST['delete'])) {
+    $dateToDelete = mysqli_real_escape_string($connection, $_POST['date']);
+    $deleteQuery = "DELETE FROM maintenance WHERE date = '$dateToDelete'";
+    
+    if (mysqli_query($connection, $deleteQuery)) {
+        echo "<script>alert('Blocked day removed successfully.'); window.location.href='Blocked.php';</script>";
+    } else {
+        echo "Error deleting record: " . mysqli_error($connection);
+    }
+}
+
 $sql = "SELECT date, reason FROM maintenance";
 $result = mysqli_query($connection, $sql);
 
@@ -177,6 +189,7 @@ if (!$result) {
                     <tr>
                         <th>Date</th>
                         <th>Reason</th>
+                        <th>Action</th> <!-- New column for actions -->
                     </tr>
                 </thead>
                 <tbody>
@@ -186,10 +199,16 @@ if (!$result) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row['date']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['reason']) . "</td>";
+                            echo "<td>
+                                    <form method='POST' action='Blocked.php' onsubmit='return confirm(\"Are you sure you want to remove this entry?\")'>
+                                        <input type='hidden' name='date' value='" . htmlspecialchars($row['date']) . "'>
+                                        <button type='submit' name='delete' class='action-button delete-button'>Remove</button>
+                                    </form>
+                                  </td>";
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='2'>No blocked days found</td></tr>";
+                        echo "<tr><td colspan='3'>No blocked days found</td></tr>";
                     }
                     // Close the database connection
                     mysqli_close($connection);

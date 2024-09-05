@@ -1,6 +1,13 @@
+
 <?php
 session_start();
 require 'Mysqlconnection.php';
+
+// Redirect to login page if EmployeeID is not set in the session
+if (!isset($_SESSION['EmployeeID'])) {
+    header("Location: Login.php");
+    exit();
+}
 
 // Set the session timeout limit (1 hour = 3600 seconds)
 $timeout_duration = 3600;
@@ -72,9 +79,7 @@ $connection->close();
                 <li class="nav-list"><img src="./Images/mail.png" class="mail" /></li>
                 <li class="nav-list"><img src="./Images/location1.png" class="location" /> </li>
                 <li class="bookbtn">
-                    <a href="/Banglow/Booking.php"
-                       onclick="handleBookingClick(event)"
-                       <?php echo $hasReachedMaxBookings ? 'style="pointer-events: none; opacity: 0.6;"' : ''; ?>>
+                    <a href="/Banglow/Booking.php" onclick="handleBookingClick(event)" <?php echo $hasReachedMaxBookings ? 'style="pointer-events: none; opacity: 0.6;"' : ''; ?>>
                         Book now
                     </a>
                 </li>

@@ -30,9 +30,77 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
     <title>Booking Form</title>
     <link rel="stylesheet" type="text/css" href="css/Booking.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <style>
+        /* Styles for the countdown circle */
+        .countdown-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .countdown-circle {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown-circle svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .countdown-circle circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .countdown-circle .background {
+            stroke: #eee;
+        }
+
+        .countdown-circle .progress {
+            stroke: red;
+            stroke-dasharray: 251; /* 2 * π * radius (40 - stroke-width) */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .countdown-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
+
+    <!-- Countdown Timer Circle -->
+    <div class="countdown-container">
+        <div class="countdown-circle">
+            <svg>
+                <circle class="background" cx="40" cy="40" r="37"></circle>
+                <circle class="progress" cx="40" cy="40" r="37"></circle>
+            </svg>
+            <div class="countdown-number" id="countdown-number">120</div>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
     <form action="Bookingbackend.php" method="post" class="booking-form">
         <h2>Book Your Stay</h2>
         <div class="form-group">
@@ -58,6 +126,29 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        // Countdown Timer JavaScript
+        const countdownNumberEl = document.getElementById('countdown-number');
+        const progressCircle = document.querySelector('.countdown-circle .progress');
+        let countdown = 120; // 120 seconds
+        const interval = 1000; // 1 second
+        const total = countdown;
+
+        const countdownInterval = setInterval(() => {
+            countdownNumberEl.textContent = countdown;
+
+            // Calculate the stroke offset for the countdown animation
+            const strokeDashOffset = 251 * (1 - countdown / total);
+            progressCircle.style.strokeDashoffset = strokeDashOffset;
+
+            // If countdown reaches zero, stop the timer and redirect
+            if (countdown === 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'index.php'; // Redirect to index.php after countdown finishes
+            }
+
+            countdown--;
+        }, interval);
+
         // Sample JavaScript logic for managing date selection
         const reservedDates = <?php
         include("Mysqlconnection.php");
@@ -78,6 +169,11 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
         echo json_encode(['reservations' => $dates, 'blocked' => $blocked_dates]);
         ?>;
 
+        /**
+         * Function to get all disabled dates
+         * @param {Array} dates - Array of reservation date ranges.
+         * @returns {Array} - Array of individual dates to disable.
+         */
         function getDisabledDates(dates) {
             const disabled = [];
             dates.forEach(range => {
@@ -85,15 +181,20 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
                 const end = new Date(range.to);
                 let current = new Date(start);
                 while (current <= end) {
-                    disabled.push(current.toISOString().split('T')[0]);
+                    disabled.push(current.toISOString().split('T')[0]); // Push each date as 'YYYY-MM-DD'
                     current.setDate(current.getDate() + 1);
                 }
             });
             return disabled;
         }
 
-        const disabledDates = getDisabledDates(reservedDates.reservations).concat(reservedDates.blocked);
-
+        /**
+         * Function to check if any blocked dates exist in the selected range.
+         * @param {Date} start - The check-in date.
+         * @param {Date} end - The check-out date.
+         * @param {Array} blockedDates - Array of blocked dates (YYYY-MM-DD).
+         * @returns {Boolean} - True if blocked dates exist in range, false otherwise.
+         */
         function checkBlockedDatesInRange(start, end, blockedDates) {
             let current = new Date(start);
             current.setDate(current.getDate() + 1); // Start checking from the day after the check-in date
@@ -106,6 +207,10 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
             return false;
         }
 
+        // Fetch disabled dates for Flatpickr from server data
+        const disabledDates = getDisabledDates(reservedDates.reservations).concat(reservedDates.blocked);
+
+        // Configure Flatpickr
         flatpickr("#checkin", {
             dateFormat: "Y-m-d",
             altInput: true,
@@ -113,7 +218,7 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
             allowInput: true,
             minDate: "today",
             maxDate: new Date().fp_incr(90), // Limit to 90 days from today
-            disable: disabledDates,
+            disable: disabledDates, // Disable reserved/blocked dates
             onChange: function (selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
                     const checkinDate = selectedDates[0];
@@ -127,37 +232,21 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
                         allowInput: true,
                         minDate: dateStr,
                         maxDate: maxCheckoutDate > new Date().fp_incr(90) ? new Date().fp_incr(90) : maxCheckoutDate,
-                        disable: disabledDates,
+                        disable: disabledDates, // Disable reserved/blocked dates
                         onChange: function (selectedCheckoutDates, checkoutDateStr, checkoutInstance) {
                             if (selectedCheckoutDates.length > 0) {
                                 const checkoutDate = selectedCheckoutDates[0];
 
-                                // Check if check-in and check-out dates are the same
-                                if (checkinDate.toISOString().split('T')[0] === checkoutDate.toISOString().split('T')[0]) {
-                                    alert("Check-in and check-out dates cannot be the same. Please select different dates.");
-                                    checkoutInstance.clear(); // Clear the checkout date if they are the same
-                                    return;
-                                }
-
+                                // Check if blocked dates exist in the selected range
                                 if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
-                                    alert("There are blocked dates within the selected check-in and check-out dates. Please select different dates.");
-                                    checkoutInstance.clear();
+                                    alert('Some dates within the selected range are blocked for maintenance.');
+                                    checkoutInstance.clear(); // Clear the checkout date selection
                                 }
                             }
                         }
                     });
                 }
             }
-        });
-
-        flatpickr("#checkout", {
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "F j, Y",
-            allowInput: true,
-            minDate: "today",
-            maxDate: new Date().fp_incr(90), // Limit to 90 days from today
-            disable: disabledDates
         });
     </script>
 </body>
