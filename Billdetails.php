@@ -12,18 +12,42 @@ if (!isset($_GET['invoicenumber'])) {
 }
 
 $invoicenumber = $_GET['invoicenumber'];
-$sql = "SELECT linenCharge, otherExpenses, totalBill FROM bills WHERE invoicenumber='$invoicenumber'";
-$result = mysqli_query($connection, $sql);
 
-if (!$result) {
-    die("Query failed: " . mysqli_error($connection));
-}
+// Fetch the bill details
+$sql = "SELECT pillowCases, bedSheets, towels, handserviette, duster, bathmate, apron, otherExpenses, totalBill 
+        FROM bills WHERE invoicenumber = ?";
+$stmt = $connection->prepare($sql);
+$stmt->bind_param("i", $invoicenumber);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$row = mysqli_fetch_assoc($result);
-
-if (!$row) {
+if ($result->num_rows == 0) {
     die("No bill details found for the given invoice number.");
 }
+
+$row = $result->fetch_assoc();
+
+// Fetch the prices for each linen item
+function getLinenPrice($connection, $item) {
+    $price = 0; // Initialize $price to avoid the unassigned variable error
+    $priceQuery = "SELECT price FROM linencharges WHERE item = ?";
+    $stmt = $connection->prepare($priceQuery);
+    $stmt->bind_param("s", $item);
+    $stmt->execute();
+    $stmt->bind_result($price);
+    $stmt->fetch();
+    $stmt->close();
+    return $price;
+}
+
+// Calculate the total price for each linen item
+$pillowCasesPrice = getLinenPrice($connection, 'pillowCase') * ($row['pillowCases'] ?? 0);
+$bedSheetsPrice = getLinenPrice($connection, 'bedSheet') * ($row['bedSheets'] ?? 0);
+$towelsPrice = getLinenPrice($connection, 'towel') * ($row['towels'] ?? 0);
+$handserviettePrice = getLinenPrice($connection, 'handserviette') * ($row['handserviette'] ?? 0);
+$dusterPrice = getLinenPrice($connection, 'duster') * ($row['duster'] ?? 0);
+$bathmatePrice = getLinenPrice($connection, 'bathmate') * ($row['bathmate'] ?? 0);
+$apronPrice = getLinenPrice($connection, 'apron') * ($row['apron'] ?? 0);
 ?>
 
 <!DOCTYPE html>
@@ -80,21 +104,62 @@ if (!$row) {
             <thead>
                 <tr>
                     <th>Charge Type</th>
-                    <th>Amount</th>
+                    <th>Quantity</th>
+                    <th>Price Per Unit</th>
+                    <th>Total Amount</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Linen Charge</td>
-                    <td><?php echo htmlspecialchars($row['linenCharge']); ?></td>
+                    <td>Pillow Cases</td>
+                    <td><?php echo htmlspecialchars($row['pillowCases'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'pillowCase')); ?></td>
+                    <td><?php echo htmlspecialchars($pillowCasesPrice); ?></td>
+                </tr>
+                <tr>
+                    <td>Bed Sheets</td>
+                    <td><?php echo htmlspecialchars($row['bedSheets'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'bedSheet')); ?></td>
+                    <td><?php echo htmlspecialchars($bedSheetsPrice); ?></td>
+                </tr>
+                <tr>
+                    <td>Towels</td>
+                    <td><?php echo htmlspecialchars($row['towels'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'towel')); ?></td>
+                    <td><?php echo htmlspecialchars($towelsPrice); ?></td>
+                </tr>
+                <tr>
+                    <td>Handserviette</td>
+                    <td><?php echo htmlspecialchars($row['handserviette'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'handserviette')); ?></td>
+                    <td><?php echo htmlspecialchars($handserviettePrice); ?></td>
+                </tr>
+                <tr>
+                    <td>Duster</td>
+                    <td><?php echo htmlspecialchars($row['duster'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'duster')); ?></td>
+                    <td><?php echo htmlspecialchars($dusterPrice); ?></td>
+                </tr>
+                <tr>
+                    <td>Bathmate</td>
+                    <td><?php echo htmlspecialchars($row['bathmate'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'bathmate')); ?></td>
+                    <td><?php echo htmlspecialchars($bathmatePrice); ?></td>
+                </tr>
+                <tr>
+                    <td>Apron</td>
+                    <td><?php echo htmlspecialchars($row['apron'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(getLinenPrice($connection, 'apron')); ?></td>
+                    <td><?php echo htmlspecialchars($apronPrice); ?></td>
                 </tr>
                 <tr>
                     <td>Other Expenses</td>
+                    <td colspan="2"></td>
                     <td><?php echo htmlspecialchars($row['otherExpenses']); ?></td>
                 </tr>
                 <tr>
                     <th>Total Bill</th>
-                    <th><?php echo htmlspecialchars($row['totalBill']); ?></th>
+                    <th colspan="3"><?php echo htmlspecialchars($row['totalBill']); ?></th>
                 </tr>
             </tbody>
         </table><br>
@@ -103,3 +168,8 @@ if (!$row) {
 </body>
 
 </html>
+
+<?php
+$stmt->close();
+$connection->close();
+?>

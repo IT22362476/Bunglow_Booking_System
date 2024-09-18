@@ -136,6 +136,8 @@
                 <li class="nav-items"><a href="Superblocked.php">Blocked Days</a></li>
                 <li class="nav-items"><a href="Superupdatetrack.php">Update Tracker</a></li>
                 <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
+                <li class="nav-items"><a href="Superlinen.php">Linen charges</a></li>
+
             </ul>
         </nav>
     </div>

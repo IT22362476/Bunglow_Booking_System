@@ -27,8 +27,8 @@ if (isset($_GET['id'])) {
 }
 
 if (isset($_POST['update'])) {
-    $checkin = $_POST['checkin'];
-    $checkout = $_POST['checkout'];
+    $checkin = !empty($_POST['checkin']) ? $_POST['checkin'] : $row['checkin'];
+    $checkout = !empty($_POST['checkout']) ? $_POST['checkout'] : $row['checkout'];
     $persons = $_POST['persons'];
     $requests = $_POST['requests'];
     $EmployeeID = $_SESSION['EmployeeID'];
