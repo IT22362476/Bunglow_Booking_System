@@ -237,10 +237,13 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
                             if (selectedCheckoutDates.length > 0) {
                                 const checkoutDate = selectedCheckoutDates[0];
 
-                                // Check if blocked dates exist in the selected range
-                                if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
-                                    alert('Some dates within the selected range are blocked for maintenance.');
-                                    checkoutInstance.clear(); // Clear the checkout date selection
+                                // Ensure check-out date is not the same as the check-in date
+                                if (checkinDate.getTime() === checkoutDate.getTime()) {
+                                    alert('Check-out date must be at least one day after the check-in date.');
+                                    checkoutInstance.clear();
+                                } else if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
+                                    alert('Selected range contains blocked dates. Please choose another range.');
+                                    checkoutInstance.clear();
                                 }
                             }
                         }

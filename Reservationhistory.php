@@ -134,6 +134,16 @@ $result = $stmt->get_result();
             color: #555;
             padding: 20px;
         }
+        .Homelk{
+            text-decoration: none;
+            color: white;
+        }
+        .Homebtn{
+            padding: 10px;
+            margin-left: 1em;
+            border-radius: 10px;
+            background-color: green;
+        }
     </style>
 </head>
 <body>
@@ -179,7 +189,7 @@ $result = $stmt->get_result();
             ?>
         </table>
     </div>
-
+    <button class="Homebtn"><a href="index.php" class="Homelk">Back to home</a></button>
     <script>
         function toggleSidebar() {
             var sidebar = document.getElementById("sidebar");
@@ -195,7 +205,6 @@ $result = $stmt->get_result();
     </script>
 </body>
 </html>
-
 <?php
 $stmt->close();
 $connection->close();

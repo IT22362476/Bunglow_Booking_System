@@ -177,6 +177,9 @@ if (isset($_POST['update'])) {
                                 if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
                                     alert("There are blocked dates within the selected check-in and check-out dates. Please select different dates.");
                                     checkoutInstance.clear();
+                                } else if (checkinDate.toISOString().split('T')[0] === checkoutDate.toISOString().split('T')[0]) {
+                                    alert("Check-in and Check-out dates cannot be the same. Please select a different check-out date.");
+                                    checkoutInstance.clear();
                                 }
                             }
                         }

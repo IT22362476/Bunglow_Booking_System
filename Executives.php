@@ -8,7 +8,7 @@ if (!isset($_SESSION['EmployeeID'])) {
 }
 
 // Query to retrieve all executives from the executives table
-$sql = "SELECT executives.EmployeeID, executives.Email, executives.picture, 
+$sql = "SELECT executives.EmployeeID, executives.Email, executives.Name,
         CASE WHEN users.EmployeeID IS NOT NULL THEN 'signed_up' ELSE 'not_signed_up' END AS status
         FROM executives
         LEFT JOIN users ON executives.EmployeeID = users.EmployeeID";
@@ -181,6 +181,7 @@ if (!$result) {
                 <thead>
                     <tr>
                         <th>Employee ID</th>
+                        <th>Name</th>
                         <th>Status</th>
                         <th>Remove</th>
                     </tr>
@@ -189,6 +190,7 @@ if (!$result) {
                     <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr class="<?php echo $row['status'] === 'signed_up' ? 'signed-up' : 'not-signed-up'; ?>">
                             <td><?php echo htmlspecialchars($row['EmployeeID']); ?></td>
+                            <td><?php echo htmlspecialchars($row['Name']); ?></td>
                             <td><?php echo $row['status'] === 'signed_up' ? 'Signed Up' : 'Not Signed Up'; ?></td>
                             <td>
                                 <form method="post" action="Executiveremove.php" onsubmit="return confirm('Are you sure you want to remove this executive?');">

@@ -164,6 +164,7 @@ $result = mysqli_query($connection, $query);
                 <th>Check-out</th>
                 <th>Persons</th>
                 <th>Requests</th>
+                <th>date of reservation make</th>
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>

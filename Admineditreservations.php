@@ -11,8 +11,8 @@ if (isset($_GET['id'])) {
 if (isset($_POST['update'])) {
     $invoicenumber = $_POST['invoicenumber'];
     $EmployeeID = $_POST['EmployeeID'];
-    $checkin = $_POST['checkin'];
-    $checkout = $_POST['checkout'];
+    $checkin = !empty($_POST['checkin']) ? $_POST['checkin'] : $row['checkin'];
+    $checkout = !empty($_POST['checkout']) ? $_POST['checkout'] : $row['checkout'];
     $persons = $_POST['persons'];
     $requests = $_POST['requests'];
 
@@ -24,26 +24,46 @@ if (isset($_POST['update'])) {
         $blocked_dates[] = $blocked_row['date'];
     }
 
-    // Check for blocked dates within the check-in and check-out range
-    $blocked_in_range = false;
-    $current_date = strtotime($checkin);
-    $end_date = strtotime($checkout);
+    // Fetch original check-in and check-out dates
+    $original_checkin = $row['checkin'];
+    $original_checkout = $row['checkout'];
 
-    // Skip the check-in date
-    $current_date = strtotime('+1 day', $current_date);
+    // Initialize variable to check if dates have changed
+    $datesChanged = false;
 
-    while ($current_date <= $end_date) {
-        if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
-            $blocked_in_range = true;
-            break;
-        }
-        $current_date = strtotime('+1 day', $current_date);
+    if ($checkin !== $original_checkin || $checkout !== $original_checkout) {
+        $datesChanged = true;
     }
 
-    if ($blocked_in_range) {
-        echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
+    // Check for blocked dates only if dates have changed
+    if ($datesChanged) {
+        // Check for blocked dates within the check-in and check-out range
+        $blocked_in_range = false;
+        $current_date = strtotime($checkin);
+        $end_date = strtotime($checkout);
+
+        // Skip the check-in date
+        $current_date = strtotime('+1 day', $current_date);
+
+        while ($current_date <= $end_date) {
+            if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
+                $blocked_in_range = true;
+                break;
+            }
+            $current_date = strtotime('+1 day', $current_date);
+        }
+
+        if ($blocked_in_range) {
+            echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
+        } else {
+            // If no blocked dates, proceed with the update
+            $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+            mysqli_query($connection, $query);
+            header("Location: Adminreservations.php");
+        }
     } else {
-        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+        // If dates haven't changed, directly update the other fields
+        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
         mysqli_query($connection, $query);
         header("Location: Adminreservations.php");
     }
@@ -65,23 +85,23 @@ if (isset($_POST['update'])) {
         <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
         <div class="form-group">
             <label for="EmployeeID">Employee ID:</label>
-            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
+            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo htmlspecialchars($row['EmployeeID']); ?>">
         </div>
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>">
+            <input type="text" id="checkin" name="checkin" value="<?php echo htmlspecialchars($row['checkin']); ?>">
         </div>
         <div class="form-group">
             <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>">
+            <input type="text" id="checkout" name="checkout" value="<?php echo htmlspecialchars($row['checkout']); ?>">
         </div>
         <div class="form-group">
             <label for="persons">Persons:</label>
-            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>">
+            <input type="number" id="persons" name="persons" value="<?php echo htmlspecialchars($row['persons']); ?>">
         </div>
         <div class="form-group">
             <label for="requests">Requests:</label>
-            <textarea id="requests" name="requests" rows="4" cols="50"><?php echo $row['requests']; ?></textarea>
+            <textarea id="requests" name="requests" rows="4" cols="50"><?php echo htmlspecialchars($row['requests']); ?></textarea>
         </div>
         <div class="form-group">
             <button type="submit" name="update">Update</button>
@@ -125,18 +145,6 @@ if (isset($_POST['update'])) {
 
         const disabledDates = getDisabledDates(reservedDates.reservations).concat(reservedDates.blocked);
 
-        function checkBlockedDatesInRange(start, end, blockedDates) {
-            let current = new Date(start);
-            current.setDate(current.getDate() + 1); // Start checking from the day after the check-in date
-            while (current <= end) {
-                if (blockedDates.includes(current.toISOString().split('T')[0])) {
-                    return true;
-                }
-                current.setDate(current.getDate() + 1);
-            }
-            return false;
-        }
-
         flatpickr("#checkin", {
             dateFormat: "Y-m-d",
             altInput: true,
@@ -148,38 +156,28 @@ if (isset($_POST['update'])) {
                 if (selectedDates.length > 0) {
                     const checkinDate = selectedDates[0];
                     const maxCheckoutDate = new Date(checkinDate);
-                    maxCheckoutDate.setDate(maxCheckoutDate.getDate() + 7); // Add 7 days
+                    maxCheckoutDate.setDate(maxCheckoutDate.getDate() + 7); // Max 7 days
 
-                    // Re-initialize checkout flatpickr with updated date range
-                    flatpickr("#checkout", {
+                    const checkoutPicker = flatpickr("#checkout", {
                         dateFormat: "Y-m-d",
                         altInput: true,
                         altFormat: "F j, Y",
                         allowInput: true,
                         minDate: dateStr,
                         maxDate: maxCheckoutDate,
-                        disable: disabledDates, // Only apply the initially blocked dates, not the entire check-in range
-                        onChange: function (selectedCheckoutDates, checkoutDateStr, checkoutInstance) {
-                            if (selectedCheckoutDates.length > 0) {
-                                const checkoutDate = selectedCheckoutDates[0];
-                                if (checkBlockedDatesInRange(checkinDate, checkoutDate, reservedDates.blocked)) {
-                                    alert("There are blocked dates within the selected check-in and check-out dates. Please select different dates.");
-                                    checkoutInstance.clear();
-                                }
-                            }
-                        }
-                    }).clear(); // Ensure the field is cleared on re-initialization
+                        disable: disabledDates
+                    });
+
+                    checkoutPicker.open();
                 }
             }
         });
 
-        // Initialize the checkout field with basic settings initially
         flatpickr("#checkout", {
             dateFormat: "Y-m-d",
             altInput: true,
             altFormat: "F j, Y",
             allowInput: true,
-            minDate: "today",
             disable: disabledDates
         });
     </script>

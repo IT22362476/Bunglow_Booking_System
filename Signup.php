@@ -16,16 +16,11 @@
     </video>
 
     <!-- Content -->
-    <!-- <h1>Signup</h1> -->
     <div class="addform">
-        <form action="Signupbackend.php" method="post">
+        <form action="Signupbackend.php" method="post" enctype="multipart/form-data"> <!-- Added enctype -->
             <div class="empInputContainer">
                 <label for="">Employee ID</label>
                 <input type="text" name="EmployeeID" placeholder="Employee ID" required><br>
-            </div>
-            <div class="empInputContainer">
-                <label for="">Guest name</label>
-                <input type="text" name="Guestname" placeholder="Guest name" required><br>
             </div>
             <div class="empInputContainer">
                 <label for="">Phone number</label>
@@ -38,6 +33,10 @@
             <div class="empInputContainer">
                 <label for="">Confirm Password</label>
                 <input type="password" name="cPassword" placeholder="*********" required><br>
+            </div>
+            <div class="empInputContainer">
+                <label for="">Profile Picture</label>
+                <input type="file" name="Picture" accept="image/*" required><br> <!-- Added file input -->
             </div>
             <div class="btnContainer">
                 <button type="submit" name="submit">Signup</button>

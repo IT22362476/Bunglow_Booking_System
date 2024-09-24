@@ -39,8 +39,7 @@
         }
 
         .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="file"] {
+        .form-group input[type="email"] {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -76,7 +75,7 @@
 <body>
     <div class="container">
         <h2>Add New Executive</h2>
-        <form action="Addmembers.php" method="post" enctype="multipart/form-data">
+        <form action="Addmembers.php" method="post">
             <div class="form-group">
                 <label for="employee_id">Employee ID:</label>
                 <input type="text" id="employee_id" name="employee_id" required>
@@ -86,8 +85,8 @@
                 <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="picture">Picture:</label>
-                <input type="file" id="picture" name="picture" accept="image/*" required>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
                 <button type="submit" name="submit">Add Member</button>
@@ -100,6 +99,7 @@
 
             $employee_id = mysqli_real_escape_string($connection, $_POST['employee_id']);
             $email = mysqli_real_escape_string($connection, $_POST['email']);
+            $name = mysqli_real_escape_string($connection, $_POST['name']);
 
             // Check if the employee ID or email already exists
             $check_query = "SELECT * FROM executives WHERE EmployeeID = '$employee_id' OR Email = '$email'";
@@ -111,26 +111,16 @@
                             window.location.href="Addmembers.php";
                         </script>';
             } else {
-                // Handling the picture upload
-                $picture = $_FILES['picture']['name'];
-                $target_dir = "uploads/";
-                $target_file = $target_dir . basename($picture);
+                // Insert into the database
+                $query = "INSERT INTO executives (EmployeeID, Email, Name) VALUES ('$employee_id', '$email', '$name')";
 
-                // Check if file was uploaded successfully
-                if (move_uploaded_file($_FILES['picture']['tmp_name'], $target_file)) {
-                    // Insert into the database
-                    $query = "INSERT INTO executives (EmployeeID, Email, picture) VALUES ('$employee_id', '$email', '$picture')";
-
-                    if (mysqli_query($connection, $query)) {
-                        echo '<script>
-                                    alert("New executive added successfully!");
-                                    window.location.href="Admindashboard.php";
-                                </script>';
-                    } else {
-                        echo '<div class="error">Error: ' . mysqli_error($connection) . '</div>';
-                    }
+                if (mysqli_query($connection, $query)) {
+                    echo '<script>
+                                alert("New executive added successfully!");
+                                window.location.href="Admindashboard.php";
+                            </script>';
                 } else {
-                    echo '<div class="error">Error uploading picture.</div>';
+                    echo '<div class="error">Error: ' . mysqli_error($connection) . '</div>';
                 }
             }
 

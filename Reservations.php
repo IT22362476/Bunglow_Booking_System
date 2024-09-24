@@ -197,6 +197,16 @@ function hasReachedMaxUpdateCount($connection, $invoicenumber)
             margin: 20px auto;
             width: fit-content;
         }
+        .Homelk{
+            text-decoration: none;
+            color: white;
+        }
+        .Homebtn{
+            padding: 10px;
+            margin-left: 1em;
+            border-radius: 10px;
+            background-color: green;
+        }
     </style>
 </head>
 
@@ -267,6 +277,7 @@ function hasReachedMaxUpdateCount($connection, $invoicenumber)
             </tbody>
         </table>
     </div>
+    <button class="Homebtn"><a href="index.php" class="Homelk">Back to home</a></button>
 
     <script>
         function toggleSidebar() {

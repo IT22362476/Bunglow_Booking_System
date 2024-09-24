@@ -11,8 +11,8 @@ if (isset($_GET['id'])) {
 if (isset($_POST['update'])) {
     $invoicenumber = $_POST['invoicenumber'];
     $EmployeeID = $_POST['EmployeeID'];
-    $checkin = $_POST['checkin'];
-    $checkout = $_POST['checkout'];
+    $checkin = !empty($_POST['checkin']) ? $_POST['checkin'] : $row['checkin'];
+    $checkout = !empty($_POST['checkout']) ? $_POST['checkout'] : $row['checkout'];
     $persons = $_POST['persons'];
     $requests = $_POST['requests'];
 
@@ -24,26 +24,38 @@ if (isset($_POST['update'])) {
         $blocked_dates[] = $blocked_row['date'];
     }
 
-    // Check for blocked dates within the check-in and check-out range
-    $blocked_in_range = false;
-    $current_date = strtotime($checkin);
-    $end_date = strtotime($checkout);
+    // Compare original dates with new ones
+    $original_checkin = $row['checkin'];
+    $original_checkout = $row['checkout'];
 
-    // Skip the check-in date
-    $current_date = strtotime('+1 day', $current_date);
+    if ($checkin !== $original_checkin || $checkout !== $original_checkout) {
+        // Check for blocked dates within the check-in and check-out range
+        $blocked_in_range = false;
+        $current_date = strtotime($checkin);
+        $end_date = strtotime($checkout);
 
-    while ($current_date <= $end_date) {
-        if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
-            $blocked_in_range = true;
-            break;
-        }
+        // Skip the check-in date
         $current_date = strtotime('+1 day', $current_date);
-    }
 
-    if ($blocked_in_range) {
-        echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
+        while ($current_date <= $end_date) {
+            if (in_array(date('Y-m-d', $current_date), $blocked_dates)) {
+                $blocked_in_range = true;
+                break;
+            }
+            $current_date = strtotime('+1 day', $current_date);
+        }
+
+        if ($blocked_in_range) {
+            echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
+        } else {
+            // If no blocked dates, proceed with the update
+            $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+            mysqli_query($connection, $query);
+            header("Location: Superadminreservations.php");
+        }
     } else {
-        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+        // If dates haven't changed, directly update the other fields
+        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
         mysqli_query($connection, $query);
         header("Location: Superadminreservations.php");
     }
@@ -52,6 +64,7 @@ if (isset($_POST['update'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,9 +72,11 @@ if (isset($_POST['update'])) {
     <link rel="stylesheet" type="text/css" href="css/Booking.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
+
 <body>
     <h2>Edit Reservation</h2>
-    <form action="Sadmineditreservations.php?id=<?php echo $row['invoicenumber']; ?>" method="post" class="booking-form">
+    <form action="Sadmineditreservations.php?id=<?php echo $row['invoicenumber']; ?>" method="post"
+        class="booking-form">
         <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
         <div class="form-group">
             <label for="EmployeeID">Employee ID:</label>
@@ -184,4 +199,5 @@ if (isset($_POST['update'])) {
         });
     </script>
 </body>
+
 </html>

@@ -8,7 +8,7 @@ if (!isset($_SESSION['EmployeeID'])) {
 }
 
 // Query to retrieve all executives from the executives table
-$sql = "SELECT executives.EmployeeID, executives.Email, executives.picture, 
+$sql = "SELECT executives.EmployeeID, executives.Email, executives.Name,
         CASE WHEN users.EmployeeID IS NOT NULL THEN 'signed_up' ELSE 'not_signed_up' END AS status
         FROM executives
         LEFT JOIN users ON executives.EmployeeID = users.EmployeeID";
@@ -163,14 +163,12 @@ if (!$result) {
     <div class="sidebar" id="sidebar">
         <nav>
             <ul class="nav-list">
-                <li class="nav-items"><a href="Superadmindashboard.php">Employee Details</a></li>
-                <li class="nav-items"><a href="Superadminreservations.php">Reservation Details</a></li>
-                <li class="nav-items"><a href="Supercalendaradmin.php">Calendar</a></li>
-                <li class="nav-items"><a href="Superblocked.php">Blocked Days</a></li>
-                <li class="nav-items"><a href="Superupdatetrack.php">Update Tracker</a></li>
-                <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
-                <li class="nav-items"><a href="Superlinen.php">Linen charges</a></li>
-
+                <li class="nav-items"><a href="Admindashboard.php">Users list</a></li>
+                <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
+                <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
+                <li class="nav-items"><a href="Adminreservations.php">Reservations</a></li>
+                <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
+                <li class="nav-items"><a href="Executives.php">Executives</a></li>
             </ul>
         </nav>
     </div>
@@ -183,6 +181,7 @@ if (!$result) {
                 <thead>
                     <tr>
                         <th>Employee ID</th>
+                        <th>Name</th>
                         <th>Status</th>
                         <th>Remove</th>
                     </tr>
@@ -191,6 +190,7 @@ if (!$result) {
                     <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr class="<?php echo $row['status'] === 'signed_up' ? 'signed-up' : 'not-signed-up'; ?>">
                             <td><?php echo htmlspecialchars($row['EmployeeID']); ?></td>
+                            <td><?php echo htmlspecialchars($row['Name']); ?></td>
                             <td><?php echo $row['status'] === 'signed_up' ? 'Signed Up' : 'Not Signed Up'; ?></td>
                             <td>
                                 <form method="post" action="Executiveremove.php" onsubmit="return confirm('Are you sure you want to remove this executive?');">
