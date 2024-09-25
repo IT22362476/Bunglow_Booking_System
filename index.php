@@ -24,20 +24,6 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
 // Retrieve the EmployeeID from the session
 $employeeID = $_SESSION['EmployeeID'];
 
-// Get the current year
-// $currentYear = date("Y");
-
-// // Query to count the number of reservations made by the user in the current year
-// $sql = "SELECT COUNT(*) as reservation_count FROM reservationhistories WHERE EmployeeID = ? AND YEAR(checkin) = ? AND status = 'Completed'";
-// $stmt = $connection->prepare($sql);
-// $stmt->bind_param("si", $employeeID, $currentYear); // 's' for string (EmployeeID), 'i' for integer (current year)
-// $stmt->execute();
-// $stmt->bind_result($reservationCount);
-// $stmt->fetch();
-// $stmt->close();
-
-// // Check if the user has reached the maximum booking limit (2 reservations)
-// $hasReachedMaxBookings = $reservationCount >= 2;
 
 $connection->close();
 ?>
@@ -51,13 +37,6 @@ $connection->close();
     <title>Coverpage</title>
     <link rel="stylesheet" type="text/css" href="css/Coverpage.css">
     <script>
-        // function handleBookingClick(event) {
-        //     var hasReachedMaxBookings = <?php echo $hasReachedMaxBookings ? 'true' : 'false'; ?>;
-        //     if (hasReachedMaxBookings) {
-        //         event.preventDefault();
-        //         alert('You have reached the maximum booking limit for this year.');
-        //     }
-        // }
 
         function toggleDropdown() {
             document.getElementById("profileDropdown").classList.toggle("show");

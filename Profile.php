@@ -13,24 +13,27 @@ $userID = $_SESSION['UserID'];
 // Handle form submission for updating user details
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $employeeID = $_POST['employeeID'];
-    $guestname = $_POST['guestname'];
+    $Name = $_POST['Name'];
     $phone = $_POST['phone'];
     $email = $_POST['email'];
-    $picture = $_POST['picture'];
 
-    $updateSql = "UPDATE users SET EmployeeID=?, Guestname=?, Phone=?, Email=?, picture=? WHERE UserID=?";
+    // Assuming the picture stays the same since no upload form is provided.
+    // You could add file upload logic here if needed.
+    $picture = $_POST['existing_picture'];
+
+    $updateSql = "UPDATE users SET EmployeeID=?, Name=?, Phone=?, Email=?, picture=? WHERE UserID=?";
     $updateStmt = $connection->prepare($updateSql);
-    $updateStmt->bind_param("sssssi", $employeeID, $guestname, $phone, $email, $picture, $userID);
+    $updateStmt->bind_param("sssssi", $employeeID, $Name, $phone, $email, $picture, $userID);
     $updateStmt->execute();
     $updateStmt->close();
     $message = "Profile updated successfully!";
 } else {
     // Fetch user details if not form submission
-    $sql = "SELECT EmployeeID, Guestname, Phone, Email, picture FROM users WHERE UserID = ?";
+    $sql = "SELECT EmployeeID, Name, Phone, Email, picture FROM users WHERE UserID = ?";
     $stmt = $connection->prepare($sql);
     $stmt->bind_param("i", $userID);
     $stmt->execute();
-    $stmt->bind_result($employeeID, $guestname, $phone, $email, $picture);
+    $stmt->bind_result($employeeID, $Name, $phone, $email, $picture);
     $stmt->fetch();
     $stmt->close();
 }
@@ -117,14 +120,14 @@ $connection->close();
     <div class="profile-container">
         <?php if (isset($message)) echo "<p class='success'>$message</p>"; ?>
         <div class="profile-header">
-            <img src="./Images/<?php echo htmlspecialchars($picture); ?>" alt="Profile Picture" class="profile-picture">
+            <img src="./uploads/<?php echo htmlspecialchars($picture); ?>" alt="Profile Picture" class="profile-picture">
         </div>
         <form action="profile.php" method="post" class="profile-form">
             <label for="employeeID">Employee ID:</label>
             <input type="text" id="employeeID" name="employeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
 
-            <label for="guestname">Name:</label>
-            <input type="text" id="guestname" name="guestname" value="<?php echo htmlspecialchars($guestname); ?>">
+            <label for="Name">Name:</label>
+            <input type="text" id="Name" name="Name" value="<?php echo htmlspecialchars($Name); ?>">
 
             <label for="phone">Phone:</label>
             <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($phone); ?>">
@@ -132,8 +135,8 @@ $connection->close();
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
 
-            <label for="picture">Picture Filename:</label>
-            <input type="text" id="picture" name="picture" value="<?php echo htmlspecialchars($picture); ?>">
+            <!-- Hidden input to keep the picture filename -->
+            <input type="hidden" name="existing_picture" value="<?php echo htmlspecialchars($picture); ?>">
 
             <button type="submit" class="update-btn">Update</button>
         </form>

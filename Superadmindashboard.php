@@ -183,7 +183,7 @@
                 require 'Mysqlconnection.php'; // Include your database connection file
                 
                 // Query to select all data from the users table
-                $sql = "SELECT UserID, EmployeeID, Guestname, Email, Phone FROM users";
+                $sql = "SELECT UserID, EmployeeID, Name, Email, Phone FROM users";
                 $result = mysqli_query($connection, $sql);
 
                 if ($result) {
@@ -192,7 +192,7 @@
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['UserID']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['EmployeeID']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['Guestname']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Email']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Phone']) . "</td>";
                         echo "<td><a href='Userupdate.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button edit-button'>Edit</a></td>";

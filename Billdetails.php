@@ -40,14 +40,14 @@ function getLinenPrice($connection, $item) {
     return $price;
 }
 
-// Calculate the total price for each linen item
-$pillowCasesPrice = getLinenPrice($connection, 'pillowCase') * ($row['pillowCases'] ?? 0);
-$bedSheetsPrice = getLinenPrice($connection, 'bedSheet') * ($row['bedSheets'] ?? 0);
-$towelsPrice = getLinenPrice($connection, 'towel') * ($row['towels'] ?? 0);
-$handserviettePrice = getLinenPrice($connection, 'handserviette') * ($row['handserviette'] ?? 0);
-$dusterPrice = getLinenPrice($connection, 'duster') * ($row['duster'] ?? 0);
-$bathmatePrice = getLinenPrice($connection, 'bathmate') * ($row['bathmate'] ?? 0);
-$apronPrice = getLinenPrice($connection, 'apron') * ($row['apron'] ?? 0);
+// Calculate the total price for each linen item, using isset to check if the value exists
+$pillowCasesPrice = getLinenPrice($connection, 'pillowCase') * (isset($row['pillowCases']) ? $row['pillowCases'] : 0);
+$bedSheetsPrice = getLinenPrice($connection, 'bedSheet') * (isset($row['bedSheets']) ? $row['bedSheets'] : 0);
+$towelsPrice = getLinenPrice($connection, 'towel') * (isset($row['towels']) ? $row['towels'] : 0);
+$handserviettePrice = getLinenPrice($connection, 'handserviette') * (isset($row['handserviette']) ? $row['handserviette'] : 0);
+$dusterPrice = getLinenPrice($connection, 'duster') * (isset($row['duster']) ? $row['duster'] : 0);
+$bathmatePrice = getLinenPrice($connection, 'bathmate') * (isset($row['bathmate']) ? $row['bathmate'] : 0);
+$apronPrice = getLinenPrice($connection, 'apron') * (isset($row['apron']) ? $row['apron'] : 0);
 ?>
 
 <!DOCTYPE html>
@@ -112,43 +112,43 @@ $apronPrice = getLinenPrice($connection, 'apron') * ($row['apron'] ?? 0);
             <tbody>
                 <tr>
                     <td>Pillow Cases</td>
-                    <td><?php echo htmlspecialchars($row['pillowCases'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['pillowCases']) ? $row['pillowCases'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'pillowCase')); ?></td>
                     <td><?php echo htmlspecialchars($pillowCasesPrice); ?></td>
                 </tr>
                 <tr>
                     <td>Bed Sheets</td>
-                    <td><?php echo htmlspecialchars($row['bedSheets'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['bedSheets']) ? $row['bedSheets'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'bedSheet')); ?></td>
                     <td><?php echo htmlspecialchars($bedSheetsPrice); ?></td>
                 </tr>
                 <tr>
                     <td>Towels</td>
-                    <td><?php echo htmlspecialchars($row['towels'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['towels']) ? $row['towels'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'towel')); ?></td>
                     <td><?php echo htmlspecialchars($towelsPrice); ?></td>
                 </tr>
                 <tr>
                     <td>Handserviette</td>
-                    <td><?php echo htmlspecialchars($row['handserviette'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['handserviette']) ? $row['handserviette'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'handserviette')); ?></td>
                     <td><?php echo htmlspecialchars($handserviettePrice); ?></td>
                 </tr>
                 <tr>
                     <td>Duster</td>
-                    <td><?php echo htmlspecialchars($row['duster'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['duster']) ? $row['duster'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'duster')); ?></td>
                     <td><?php echo htmlspecialchars($dusterPrice); ?></td>
                 </tr>
                 <tr>
                     <td>Bathmate</td>
-                    <td><?php echo htmlspecialchars($row['bathmate'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['bathmate']) ? $row['bathmate'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'bathmate')); ?></td>
                     <td><?php echo htmlspecialchars($bathmatePrice); ?></td>
                 </tr>
                 <tr>
                     <td>Apron</td>
-                    <td><?php echo htmlspecialchars($row['apron'] ?? 0); ?></td>
+                    <td><?php echo htmlspecialchars(isset($row['apron']) ? $row['apron'] : 0); ?></td>
                     <td><?php echo htmlspecialchars(getLinenPrice($connection, 'apron')); ?></td>
                     <td><?php echo htmlspecialchars($apronPrice); ?></td>
                 </tr>
