@@ -7,11 +7,20 @@ if (!isset($_SESSION['EmployeeID'])) {
     exit();
 }
 
+// Initialize the search term variable
+$searchTerm = isset($_POST['search']) ? trim($_POST['search']) : '';
+
 // Query to retrieve all executives from the executives table
 $sql = "SELECT executives.EmployeeID, executives.Email, executives.Name,
         CASE WHEN users.EmployeeID IS NOT NULL THEN 'signed_up' ELSE 'not_signed_up' END AS status
         FROM executives
         LEFT JOIN users ON executives.EmployeeID = users.EmployeeID";
+
+// Add search condition if a search term is provided
+if ($searchTerm !== '') {
+    $sql .= " WHERE executives.EmployeeID = '" . mysqli_real_escape_string($connection, $searchTerm) . "' 
+               OR executives.Name LIKE '%" . mysqli_real_escape_string($connection, $searchTerm) . "%'";
+}
 
 $result = mysqli_query($connection, $sql);
 
@@ -109,7 +118,8 @@ if (!$result) {
             margin-top: 20px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
@@ -152,6 +162,44 @@ if (!$result) {
         .remove-btn:hover {
             background-color: #c0392b; /* Darker red on hover */
         }
+
+        /* Search bar styling */
+        .search-container {
+            display: flex;
+            justify-content: flex-end; /* Align to the right */
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            padding: 10px;
+            width: 200px; /* Fixed width for search input */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-container button {
+            padding: 10px;
+            margin-left: 5px;
+            background-color: #4CAF50; /* Green background for search button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        .addbtn{
+            background-color: #2f8f2f;
+            padding: 0.5em;
+            margin-top: 1em;
+            border-radius: 1em;
+        }
+        .addbtn a{
+            color: white;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -177,6 +225,16 @@ if (!$result) {
     <div class="main-content" id="main-container">
         <div class="container">
             <h1>Executive List</h1>
+            <button class="addbtn"><a href="Addmembers.php">Add member</a></button>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <form method="post" action="">
+                    <input type="text" name="search" placeholder="Search by Employee ID or Name" value="<?php echo htmlspecialchars($searchTerm); ?>">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -193,7 +251,7 @@ if (!$result) {
                             <td><?php echo htmlspecialchars($row['Name']); ?></td>
                             <td><?php echo $row['status'] === 'signed_up' ? 'Signed Up' : 'Not Signed Up'; ?></td>
                             <td>
-                                <form method="post" action="Executiveremove.php" onsubmit="return confirm('Are you sure you want to remove this executive?');">
+                                <form method="post" action="Executiveremove.php" onsubmit="return confirmRemove();">
                                     <input type="hidden" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
                                     <button type="submit" class="remove-btn">Remove</button>
                                 </form>
@@ -205,7 +263,7 @@ if (!$result) {
         </div>
     </div>
 
-    <!-- JavaScript for Sidebar Toggle -->
+    <!-- JavaScript for Sidebar Toggle and Confirm Remove -->
     <script>
         // Function to toggle the sidebar
         function toggleSidebar() {
@@ -220,16 +278,11 @@ if (!$result) {
             }
         }
 
-        // Initialize the page based on sidebar state
-        document.addEventListener('DOMContentLoaded', function() {
-            var sidebar = document.getElementById("sidebar");
-            var container = document.getElementById("main-container");
-            if (sidebar.classList.contains("active")) {
-                container.style.marginLeft = "250px";
-            } else {
-                container.style.marginLeft = "0";
-            }
-        });
+        // Function to confirm before removing an executive
+        function confirmRemove() {
+            return confirm("Are you sure you want to remove this executive?");
+        }
     </script>
 </body>
+
 </html>

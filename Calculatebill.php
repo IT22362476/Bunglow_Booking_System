@@ -6,7 +6,8 @@ require 'PHPMailer/src/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
-function sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $pillowCasesPrice, $bedSheetsPrice, $towelsPrice, $handserviettePrice, $dusterPrice, $bathmatePrice, $apronPrice) {
+function sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $pillowCasesPrice, $bedSheetsPrice, $towelsPrice, $handserviettePrice, $dusterPrice, $bathmatePrice, $apronPrice)
+{
     global $connection;
 
     // Fetch employee email
@@ -23,7 +24,7 @@ function sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $t
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'denuwansathsara0412@gmail.com';
-        $mail->Password = 'boaa moki kmax yzyz';
+        $mail->Password = 'boaa moki kmax yzyz'; // Make sure to use an app password if using Gmail
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
 
@@ -32,30 +33,82 @@ function sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $t
 
         $mail->isHTML(true);
         $mail->Subject = 'Your Bill Details';
-        $mail->Body    = "
+
+        // Create table for the bill details
+        $mail->Body = "
             <h1>Bill Details</h1>
             <p>Invoice Number: $invoicenumber</p>
-            <p>Pillow Cases: $pillowCases (Total: Rs$pillowCasesPrice)</p>
-            <p>Bed Sheets: $bedSheets (Total: Rs$bedSheetsPrice)</p>
-            <p>Towels: $towels (Total: Rs$towelsPrice)</p>
-            <p>Handserviette: $handserviette (Total: Rs$handserviettePrice)</p>
-            <p>Duster: $duster (Total: Rs$dusterPrice)</p>
-            <p>Bathmate: $bathmate (Total: Rs$bathmatePrice)</p>
-            <p>Aprons: $apron (Total: Rs$apronPrice)</p>
-            <p>Other Expenses: Rs$otherExpenses</p>
-            <p>Total Bill: Rs$totalBill</p>
+            <table border='1' cellpadding='5' cellspacing='0'>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price (Rs)</th>
+                    <th>Total (Rs)</th>
+                </tr>
+                <tr>
+                    <td>Pillow Cases</td>
+                    <td>$pillowCases</td>
+                    <td>$pillowCasesPrice</td>
+                    <td>" . $pillowCases * $pillowCasesPrice . "</td>
+                </tr>
+                <tr>
+                    <td>Bed Sheets</td>
+                    <td>$bedSheets</td>
+                    <td>$bedSheetsPrice</td>
+                    <td>" . $bedSheets * $bedSheetsPrice . "</td>
+                </tr>
+                <tr>
+                    <td>Towels</td>
+                    <td>$towels</td>
+                    <td>$towelsPrice</td>
+                    <td>" . $towels * $towelsPrice . "</td>
+                </tr>
+                <tr>
+                    <td>Handserviette</td>
+                    <td>$handserviette</td>
+                    <td>$handserviettePrice</td>
+                    <td>" . $handserviette * $handserviettePrice . "</td>
+                </tr>
+                <tr>
+                    <td>Duster</td>
+                    <td>$duster</td>
+                    <td>$dusterPrice</td>
+                    <td>" . $duster * $dusterPrice . "</td>
+                </tr>
+                <tr>
+                    <td>Bathmate</td>
+                    <td>$bathmate</td>
+                    <td>$bathmatePrice</td>
+                    <td>" . $bathmate * $bathmatePrice . "</td>
+                </tr>
+                <tr>
+                    <td>Apron</td>
+                    <td>$apron</td>
+                    <td>$apronPrice</td>
+                    <td>" . $apron * $apronPrice . "</td>
+                </tr>
+                <tr>
+                    <td>Other Expenses</td>
+                    <td colspan='3'>Rs$otherExpenses</td>
+                </tr>
+                <tr>
+                    <th colspan='3'>Total Bill</th>
+                    <th>Rs$totalBill</th>
+                </tr>
+            </table>
         ";
 
         if (!$mail->send()) {
             echo "<h1>Email could not be sent. Mailer Error: " . $mail->ErrorInfo . "</h1>";
         } else {
             echo "<h2>Email has been sent to the employee.</h2>";
+            echo "<a href='Operationaldashboard.php' style='display: inline-block; background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Back to Dashboard</a>";
         }
+        
     } else {
         echo "<h1>Employee email not found.</h1>";
     }
 }
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get the values from the form
     $pillowCases = $_POST['pillowCases'];
@@ -68,6 +121,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $otherExpenses = $_POST['otherExpenses'];
     $employeeID = $_POST['EmployeeID'];
     $invoicenumber = $_POST['invoicenumber'];
+
+    // Handle image upload
+    $damageImage = '';
+    if (isset($_FILES['damageImage']) && $_FILES['damageImage']['error'] == UPLOAD_ERR_OK) {
+        $targetDir = "uploads/"; // Directory to save uploaded images
+        $targetFile = basename($_FILES['damageImage']['name']);
+        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+        // Check if file is an actual image
+        $check = getimagesize($_FILES['damageImage']['tmp_name']);
+        if ($check !== false) {
+            // Check file size (limit to 2MB)
+            if ($_FILES['damageImage']['size'] > 2000000) {
+                echo "<h1>Sorry, your file is too large.</h1>";
+                exit;
+            }
+            // Allow certain file formats
+            if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
+                echo "<h1>Sorry, only JPG, JPEG, PNG & GIF files are allowed.</h1>";
+                exit;
+            }
+            // Attempt to move the uploaded file
+            if (!move_uploaded_file($_FILES['damageImage']['tmp_name'], $targetFile)) {
+                echo "<h1>Sorry, there was an error uploading your file.</h1>";
+                exit;
+            }
+            $damageImage = $targetFile; // Save the path of the uploaded image
+        } else {
+            echo "<h1>File is not an image.</h1>";
+            exit;
+        }
+    }
+
+    $damageImage1 = '';
+    if (isset($_FILES['damageImage1']) && $_FILES['damageImage1']['error'] == UPLOAD_ERR_OK) {
+        $targetDir = "uploads/"; // Directory to save uploaded images
+        $targetFile = basename($_FILES['damageImage1']['name']);
+        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+        // Check if file is an actual image
+        $check = getimagesize($_FILES['damageImage1']['tmp_name']);
+        if ($check !== false) {
+            // Check file size (limit to 2MB)
+            if ($_FILES['damageImage1']['size'] > 2000000) {
+                echo "<h1>Sorry, your file is too large.</h1>";
+                exit;
+            }
+            // Allow certain file formats
+            if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
+                echo "<h1>Sorry, only JPG, JPEG, PNG & GIF files are allowed.</h1>";
+                exit;
+            }
+            // Attempt to move the uploaded file
+            if (!move_uploaded_file($_FILES['damageImage1']['tmp_name'], $targetFile)) {
+                echo "<h1>Sorry, there was an error uploading your file.</h1>";
+                exit;
+            }
+            $damageImage1 = $targetFile; // Save the path of the uploaded image
+        } else {
+            echo "<h1>File is not an image.</h1>";
+            exit;
+        }
+    }
+
+    $damageImage2 = '';
+    if (isset($_FILES['damageImage2']) && $_FILES['damageImage2']['error'] == UPLOAD_ERR_OK) {
+        $targetDir = "uploads/"; // Directory to save uploaded images
+        $targetFile = basename($_FILES['damageImage2']['name']);
+        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+        // Check if file is an actual image
+        $check = getimagesize($_FILES['damageImage2']['tmp_name']);
+        if ($check !== false) {
+            // Check file size (limit to 2MB)
+            if ($_FILES['damageImage2']['size'] > 2000000) {
+                echo "<h1>Sorry, your file is too large.</h1>";
+                exit;
+            }
+            // Allow certain file formats
+            if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
+                echo "<h1>Sorry, only JPG, JPEG, PNG & GIF files are allowed.</h1>";
+                exit;
+            }
+            // Attempt to move the uploaded file
+            if (!move_uploaded_file($_FILES['damageImage2']['tmp_name'], $targetFile)) {
+                echo "<h1>Sorry, there was an error uploading your file.</h1>";
+                exit;
+            }
+            $damageImage2 = $targetFile; // Save the path of the uploaded image
+        } else {
+            echo "<h1>File is not an image.</h1>";
+            exit;
+        }
+    }
 
     // Validate the input
     if (is_numeric($pillowCases) && is_numeric($bedSheets) && is_numeric($towels) && is_numeric($otherExpenses)) {
@@ -152,26 +299,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<h1>Error: The invoicenumber already exists.</h1>";
         } else {
             // Insert the bill into the database with each item stored separately
-            $stmt = $connection->prepare("INSERT INTO bills (invoicenumber, EmployeeID, pillowCases, bedSheets, towels, handserviette, duster, bathmate, apron, otherExpenses, totalBill) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("isiiiiiiidd", $invoicenumber, $employeeID, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill);
+            $stmt = $connection->prepare("INSERT INTO bills (invoicenumber, EmployeeID, pillowCases, bedSheets, towels, handserviette, duster, bathmate, apron, otherExpenses, totalBill, damages,damages1,damages2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)");
+            $stmt->bind_param("isiiiiiiiddsss", $invoicenumber, $employeeID, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $damageImage,$damageImage1,$damageImage2);
 
             if ($stmt->execute()) {
-                echo "<h1>Total Bill: Rs$totalBill</h1>";
-                echo "<h2>Bill successfully stored in the database.</h2>";
-                echo "<a href='Operationaldashboard.php'>Back to Dashboard</a>";
-
-                // Send email to the employee with the detailed bill, including item prices
+                echo "<h2>Bill has been successfully created.</h2>";
                 sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $pillowCasesPrice, $bedSheetsPrice, $towelsPrice, $handserviettePrice, $dusterPrice, $bathmatePrice, $apronPrice);
             } else {
                 echo "<h1>Error: " . $stmt->error . "</h1>";
             }
-
-            // Close the statement and connection
             $stmt->close();
-            $connection->close();
         }
     } else {
-        echo "<h1>Please enter valid numbers for all charges.</h1>";
+        echo "<h1>Please enter valid numeric values for the linen items.</h1>";
     }
 } else {
     $employeeID = $_GET['EmployeeID'];
@@ -231,13 +371,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 margin-bottom: 20px;
                 color: #4CAF50;
             }
+
+            .button-container {
+                text-align: center;
+                /* Center the button */
+                margin-top: 20px;
+                /* Add some space above the button */
+            }
+
+            .subbtn {
+                padding: 10px;
+                border-style: solid;
+                border-color: green;
+                border-radius: 1em;
+                background-color: green;
+                color: white;
+                /* Add text color */
+                font-size: 16px;
+                /* Adjust font size */
+            }
+            .imageflx{
+                display:flex;
+            }
         </style>
     </head>
 
     <body>
         <div class="form-container">
             <h2>Calculate Total Bill</h2>
-            <form action="Calculatebill.php" method="post">
+            <form action="Calculatebill.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="EmployeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
                 <input type="hidden" name="invoicenumber" value="<?php echo htmlspecialchars($invoicenumber); ?>">
                 <label for="pillowCases">Number of Pillow Cases:</label>
@@ -264,7 +426,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="otherExpenses">Other Expenses:</label>
                 <input type="number" id="otherExpenses" name="otherExpenses" required>
                 <br>
-                <input type="submit" value="Calculate Total Bill">
+                <div class="imageflx">
+                    <div>
+                        <label for="damageImage">Upload Image of<br>Damaged Item:</label>
+                        <input type="file" name="damageImage" id="damageImage" accept="image/*">
+                    </div>
+                    <div>
+                        <label for="damageImage">Upload Image of<br>Damaged Item:</label>
+                        <input type="file" name="damageImage1" id="damageImage1" accept="image/*">
+                    </div>
+                    <div>
+                        <label for="damageImage">Upload Image of<br>Damaged Item:</label>
+                        <input type="file" name="damageImage2" id="damageImage2" accept="image/*">
+                    </div>
+                </div>
+                <br><br>
+                <div class="button-container">
+                    <button type="submit" class="subbtn">Calculate Total Bill</button>
+                </div>
             </form>
         </div>
     </body>

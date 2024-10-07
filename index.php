@@ -105,7 +105,7 @@ $connection->close();
             <div class="part2">
                 <li class="nav-list"><a href="/Banglow/index.php">HOME</a></li>
                 <li class="nav-list"><a href="/Banglow/Reservations.php">RESERVATION</a></li>
-                <li class="nav-list"><a href="/Banglow/About.php">ABOUT</a></li>
+                <li class="nav-list"><a href="/Banglow/About.php">RULES & REGULATIONS</a></li>
             </div>
             <div class="part3">
                 <li class="nav-list dropdown">

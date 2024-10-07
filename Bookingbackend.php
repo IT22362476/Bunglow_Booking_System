@@ -7,6 +7,9 @@ require 'PHPMailer/src/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
+// Set the correct timezone
+date_default_timezone_set('Asia/Colombo'); // Set the desired timezone
+
 // Function to check if dates overlap
 function datesOverlap($start1, $end1, $start2, $end2) {
     return $start1 <= $end2 && $start2 <= $end1;
@@ -106,9 +109,12 @@ if (isset($_POST['submit'])) {
             }
 
             if ($isAvailable) {
-                // Insert the new reservation if available, including EmployeeID
-                $sql = "INSERT INTO reservations (EmployeeID, checkin, checkout, persons, requests) 
-                        VALUES ('$EmployeeID', '$checkin', '$checkout', '$persons', '$requests')";
+                // Get the current date for bookdate
+                $bookdate = date('Y-m-d H:i:s'); // Get the current date and time
+
+                // Insert the new reservation if available, including EmployeeID and bookdate
+                $sql = "INSERT INTO reservations (EmployeeID, checkin, checkout, persons, requests, bookdate) 
+                        VALUES ('$EmployeeID', '$checkin', '$checkout', '$persons', '$requests', '$bookdate')";
                 $result = mysqli_query($connection, $sql);
 
                 if ($result) {

@@ -12,8 +12,28 @@ if (!isset($_SESSION['EmployeeID'])) {
 }
 
 // Retrieve update logs from the database, format update_date to YYYY-MM-DD
-$query = "SELECT EmployeeID, invoicenumber, update_count, DATE_FORMAT(update_date, '%Y-%m-%d') as update_date FROM update_logs";
+$query = "
+    SELECT 
+        u.Name, 
+        ul.EmployeeID, 
+        ul.invoicenumber, 
+        ul.update_count, 
+        DATE_FORMAT(ul.update_date, '%Y-%m-%d') as update_date 
+    FROM 
+        update_logs ul
+    JOIN 
+        users u ON ul.EmployeeID = u.EmployeeID"; // Assuming EmployeeID is the foreign key in users table
 $result = $connection->query($query);
+
+// Store the logs in an array for filtering
+$logs = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $logs[] = $row;
+    }
+} else {
+    $logs = []; // No logs found
+}
 ?>
 
 <!DOCTYPE html>
@@ -141,6 +161,18 @@ $result = $connection->query($query);
         a:hover {
             text-decoration: underline;
         }
+
+        /* Search input styling */
+        .search-container {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .search-container input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -158,6 +190,9 @@ $result = $connection->query($query);
                 <li class="nav-items"><a href="Superblocked.php">Blocked Days</a></li>
                 <li class="nav-items"><a href="Superupdatetrack.php">Update Tracker</a></li>
                 <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
+                <li class="nav-items"><a href="Superlinen.php">Linen charges</a></li>
+                <li class="nav-items"><a href="Viewhistories.php">View History</a></li>
+
             </ul>
         </nav>
     </div>
@@ -166,10 +201,14 @@ $result = $connection->query($query);
     <div class="main-content" id="main-container">
         <div class="container">
             <h1>Update Logs</h1>
-            <table>
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Search by Employee ID or Name" onkeyup="filterLogs()">
+            </div>
+            <table id="updateLogTable">
                 <thead>
                     <tr>
                         <th>Employee ID</th>
+                        <th>Name</th> <!-- New Name column -->
                         <th>Invoice Number</th>
                         <th>Update Count</th>
                         <th>Update Date</th>
@@ -178,18 +217,19 @@ $result = $connection->query($query);
                 <tbody>
                     <?php
                     // Check if any records were found
-                    if ($result->num_rows > 0) {
+                    if (count($logs) > 0) {
                         // Loop through the result and display the records
-                        while ($row = $result->fetch_assoc()) {
+                        foreach ($logs as $row) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row['EmployeeID']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['Name']) . "</td>"; // Display Name
                             echo "<td>" . htmlspecialchars($row['invoicenumber']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['update_count']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['update_date']) . "</td>";
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='4'>No update logs found</td></tr>";
+                        echo "<tr><td colspan='5'>No update logs found</td></tr>"; // Adjusted colspan
                     }
                     ?>
                 </tbody>
@@ -197,7 +237,7 @@ $result = $connection->query($query);
         </div>
     </div>
 
-    <!-- JavaScript for Sidebar Toggle -->
+    <!-- JavaScript for Sidebar Toggle and Search Filter -->
     <script>
         // Function to toggle the sidebar
         function toggleSidebar() {
@@ -222,6 +262,29 @@ $result = $connection->query($query);
                 container.style.marginLeft = "0";
             }
         });
+
+        // Function to filter logs based on the search input
+        function filterLogs() {
+            const input = document.getElementById('search').value.toLowerCase();
+            const table = document.getElementById('updateLogTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+
+                // Check EmployeeID and Name columns
+                if (cells.length > 1) {
+                    const employeeID = cells[0].textContent.toLowerCase();
+                    const name = cells[1].textContent.toLowerCase();
+                    if (employeeID.includes(input) || name.includes(input)) {
+                        found = true; // Match found
+                    }
+                }
+
+                rows[i].style.display = found ? "" : "none"; // Show or hide row based on match
+            }
+        }
     </script>
 </body>
 </html>

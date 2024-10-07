@@ -159,25 +159,22 @@ $result = mysqli_query($connection, $query);
         <table>
             <tr>
                 <th>Invoice Number</th>
+                <th>Book Date</th> <!-- New Book Date Column -->
                 <th>Employee ID</th>
                 <th>Check-in</th>
                 <th>Check-out</th>
                 <th>Persons</th>
                 <th>Requests</th>
-                <th>date of reservation make</th>
-                <th>Edit</th>
-                <th>Remove</th>
             </tr>
             <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                 <tr>
                     <td><?php echo htmlspecialchars($row['invoicenumber']); ?></td>
+                    <td><?php echo htmlspecialchars(date('Y-m-d', strtotime($row['bookdate']))); ?></td> <!-- Displaying bookdate -->
                     <td><?php echo htmlspecialchars($row['EmployeeID']); ?></td>
                     <td><?php echo htmlspecialchars($row['checkin']); ?></td>
                     <td><?php echo htmlspecialchars($row['checkout']); ?></td>
                     <td><?php echo htmlspecialchars($row['persons']); ?></td>
                     <td><?php echo htmlspecialchars($row['requests']); ?></td>
-                    <td><a href="Admineditreservations.php?id=<?php echo htmlspecialchars($row['invoicenumber']); ?>" class="edit-btn">Edit</a></td>
-                    <td><a href="Adminreservationdelete.php?id=<?php echo htmlspecialchars($row['invoicenumber']); ?>" class="remove-btn">Delete</a></td>
                 </tr>
             <?php } ?>
         </table>

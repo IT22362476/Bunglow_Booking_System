@@ -26,13 +26,15 @@ if (isset($_GET['UserID'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $userID = $_POST['UserID'];
     $employeeID = $_POST['EmployeeID'];
-    $guestname = $_POST['Guestname'];
+    $Name = $_POST['Name'];
     $email = $_POST['Email'];
     $phone = $_POST['Phone'];
+    $Password = $_POST['Password'];
+    
 
-    $sql = "UPDATE users SET EmployeeID = ?, Guestname = ?, Email = ?, Phone = ? WHERE UserID = ?";
+    $sql = "UPDATE users SET EmployeeID = ?, Name = ?, Email = ?, Phone = ?,Password = ? WHERE UserID = ?";
     $stmt = mysqli_prepare($connection, $sql);
-    mysqli_stmt_bind_param($stmt, 'ssssi', $employeeID, $guestname, $email, $phone, $userID);
+    mysqli_stmt_bind_param($stmt, 'sssssi', $employeeID, $Name, $email, $phone,$Password ,$userID);
 
     if (mysqli_stmt_execute($stmt)) {
         echo "User updated successfully!";
@@ -87,10 +89,30 @@ mysqli_close($connection);
             color: #fff;
             border: none;
             cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            width: 200px; /* Set a fixed width for the button */
         }
 
         h2 {
             text-align: center;
+        }
+
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center align horizontally */
+            margin-top: 20px; /* Optional: Add some space above */
         }
     </style>
 </head>
@@ -104,8 +126,8 @@ mysqli_close($connection);
             <input type="text" name="EmployeeID" id="EmployeeID" value="<?php echo htmlspecialchars($user['EmployeeID']); ?>" required>
         </div>
         <div class="form-group">
-            <label for="Guestname">Guestname:</label>
-            <input type="text" name="Guestname" id="Guestname" value="<?php echo htmlspecialchars($user['Guestname']); ?>" required>
+            <label for="Name">Guestname:</label>
+            <input type="text" name="Name" id="Name" value="<?php echo htmlspecialchars($user['Name']); ?>" required>
         </div>
         <div class="form-group">
             <label for="Email">Email:</label>
@@ -115,7 +137,14 @@ mysqli_close($connection);
             <label for="Phone">Phone:</label>
             <input type="text" name="Phone" id="Phone" value="<?php echo htmlspecialchars($user['Phone']); ?>" required>
         </div>
+        <div class="form-group">
+            <label for="Password">Password:</label>
+            <input type="text" name="Password" id="Password" value="<?php echo htmlspecialchars($user['Password']); ?>" required>
+        </div>
         <button type="submit" name="update">Update User</button>
     </form>
+    <div class="center-container">
+        <a href="Superadmindashboard.php" class="back-button">Back to Superadmin Dashboard</a>
+    </div>
 </body>
 </html>

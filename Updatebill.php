@@ -34,23 +34,65 @@ function sendUpdatedBillEmail($employeeID, $invoicenumber, $pillowCases, $bedShe
         $mail->Subject = 'Your Updated Bill Details';
         $mail->Body = "
             <h1>Updated Bill Details</h1>
-            <p>Invoice Number: $invoicenumber</p>
-            <p>Pillow Cases: $pillowCases - Total Price: Rs$pillowCasesTotal</p>
-            <p>Bed Sheets: $bedSheets - Total Price: Rs$bedSheetsTotal</p>
-            <p>Towels: $towels - Total Price: Rs$towelsTotal</p>
-            <p>Handserviette: $handserviette - Total Price: Rs$handservietteTotal</p>
-            <p>Duster: $duster - Total Price: Rs$dusterTotal</p>
-            <p>Bathmate: $bathmate - Total Price: Rs$bathmateTotal</p>
-            <p>Aprons: $apron - Total Price: Rs$apronTotal</p>
-            <p>Other Expenses: Rs$otherExpenses</p>
-            <p>Total Bill: Rs$totalBill</p>
+            <table style='border-collapse: collapse; width: 100%;'>
+                <tr>
+                    <th style='border: 1px solid #4CAF50; padding: 8px; text-align: left;'>Item</th>
+                    <th style='border: 1px solid #4CAF50; padding: 8px; text-align: left;'>Quantity</th>
+                    <th style='border: 1px solid #4CAF50; padding: 8px; text-align: left;'>Total Price (Rs)</th>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Pillow Cases</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$pillowCases</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$pillowCasesTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Bed Sheets</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$bedSheets</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$bedSheetsTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Towels</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$towels</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$towelsTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Handserviette</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$handserviette</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$handservietteTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Duster</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$duster</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$dusterTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Bathmate</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$bathmate</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$bathmateTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Aprons</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$apron</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$apronTotal</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>Other Expenses</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>-</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>$otherExpenses</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #4CAF50; padding: 8px; font-weight: bold;'>Total Bill</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px;'>-</td>
+                    <td style='border: 1px solid #4CAF50; padding: 8px; font-weight: bold;'>$totalBill</td>
+                </tr>
+            </table>
         ";
 
         if (!$mail->send()) {
             echo "<h1>Email could not be sent. Mailer Error: " . $mail->ErrorInfo . "</h1>";
         } else {
             echo "<h2>Updated bill email has been sent to the employee.</h2>";
-            echo "<a href='Operationaldashboard.php'>Back to Dashboard</a>";
+            echo "<a href='Operationaldashboard.php' style='display: inline-block; background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Back to Dashboard</a>";
         }
     } else {
         echo "<h1>Employee email not found.</h1>";

@@ -71,17 +71,30 @@ if (isset($_POST['update'])) {
     <title>Edit Reservation</title>
     <link rel="stylesheet" type="text/css" href="css/Booking.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .dashboard-button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
     <h2>Edit Reservation</h2>
-    <form action="Sadmineditreservations.php?id=<?php echo $row['invoicenumber']; ?>" method="post"
-        class="booking-form">
+    <form action="Sadmineditreservations.php?id=<?php echo $row['invoicenumber']; ?>" method="post" class="booking-form">
         <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
-        <div class="form-group">
-            <label for="EmployeeID">Employee ID:</label>
-            <input type="text" id="EmployeeID" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
-        </div>
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
             <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>">
@@ -102,6 +115,10 @@ if (isset($_POST['update'])) {
             <button type="submit" name="update">Update</button>
         </div>
     </form>
+
+    <div class="button-container">
+        <a href="Superadminreservations.php" class="dashboard-button">Go to Dashboard</a>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
