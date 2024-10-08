@@ -10,7 +10,6 @@ if (isset($_GET['id'])) {
 
 if (isset($_POST['update'])) {
     $invoicenumber = $_POST['invoicenumber'];
-    $EmployeeID = $_POST['EmployeeID'];
     $checkin = !empty($_POST['checkin']) ? $_POST['checkin'] : $row['checkin'];
     $checkout = !empty($_POST['checkout']) ? $_POST['checkout'] : $row['checkout'];
     $persons = $_POST['persons'];
@@ -49,13 +48,13 @@ if (isset($_POST['update'])) {
             echo "There are blocked dates within the selected check-in and check-out dates. Please select different dates.";
         } else {
             // If no blocked dates, proceed with the update
-            $query = "UPDATE reservations SET EmployeeID='$EmployeeID', checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+            $query = "UPDATE reservations SET checkin='$checkin', checkout='$checkout', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
             mysqli_query($connection, $query);
             header("Location: Superadminreservations.php");
         }
     } else {
         // If dates haven't changed, directly update the other fields
-        $query = "UPDATE reservations SET EmployeeID='$EmployeeID', persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
+        $query = "UPDATE reservations SET persons='$persons', requests='$requests' WHERE invoicenumber='$invoicenumber'";
         mysqli_query($connection, $query);
         header("Location: Superadminreservations.php");
     }
@@ -83,7 +82,7 @@ if (isset($_POST['update'])) {
             border: none;
             border-radius: 5px;
         }
-        
+
         .button-container {
             text-align: center;
             margin-top: 20px;
@@ -97,15 +96,15 @@ if (isset($_POST['update'])) {
         <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
         <div class="form-group">
             <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>">
+            <input type="text" id="checkin" name="checkin" value="<?php echo $row['checkin']; ?>" >
         </div>
         <div class="form-group">
             <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>">
+            <input type="text" id="checkout" name="checkout" value="<?php echo $row['checkout']; ?>" >
         </div>
         <div class="form-group">
             <label for="persons">Persons:</label>
-            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>">
+            <input type="number" id="persons" name="persons" value="<?php echo $row['persons']; ?>" >
         </div>
         <div class="form-group">
             <label for="requests">Requests:</label>

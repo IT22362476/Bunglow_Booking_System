@@ -96,15 +96,13 @@ if (!$result) {
 
         /* Main content styles */
         .main-content {
-            margin-left: 250px;
+            margin-left: 0; /* Start with no margin */
             padding: 20px;
-            width: calc(100% - 250px);
-            transition: margin-left 0.3s, width 0.3s;
+            transition: margin-left 0.3s; /* Smooth transition */
         }
 
-        .main-content.shrink {
-            margin-left: 0;
-            width: 100%;
+        .main-content.active {
+            margin-left: 250px; /* Adjust for the sidebar width */
         }
 
         h1 {
@@ -190,13 +188,15 @@ if (!$result) {
         .search-container button:hover {
             background-color: #45a049; /* Darker green on hover */
         }
-        .addbtn{
+
+        .addbtn {
             background-color: #2f8f2f;
             padding: 0.5em;
             margin-top: 1em;
             border-radius: 1em;
         }
-        .addbtn a{
+
+        .addbtn a {
             color: white;
             text-decoration: none;
         }
@@ -211,12 +211,13 @@ if (!$result) {
     <div class="sidebar" id="sidebar">
         <nav>
             <ul class="nav-list">
-                <li class="nav-items"><a href="Admindashboard.php">Users list</a></li>
+            <li class="nav-items"><a href="Admindashboard.php">Users list</a></li>
                 <li class="nav-items"><a href="Calendaradmin.php">Calendar</a></li>
                 <li class="nav-items"><a href="Blocked.php">Blocked Days</a></li>
                 <li class="nav-items"><a href="Adminreservations.php">Reservations</a></li>
                 <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
                 <li class="nav-items"><a href="Executives.php">Executives</a></li>
+
             </ul>
         </nav>
     </div>
@@ -251,10 +252,14 @@ if (!$result) {
                             <td><?php echo htmlspecialchars($row['Name']); ?></td>
                             <td><?php echo $row['status'] === 'signed_up' ? 'Signed Up' : 'Not Signed Up'; ?></td>
                             <td>
-                                <form method="post" action="Executiveremove.php" onsubmit="return confirmRemove();">
-                                    <input type="hidden" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
-                                    <button type="submit" class="remove-btn">Remove</button>
-                                </form>
+                                <?php if (!in_array($row['EmployeeID'], ['Admin', 'SuperAdmin', 'Operational'])): ?>
+                                    <form method="post" action="Executiveremove.php" onsubmit="return confirmRemove();">
+                                        <input type="hidden" name="EmployeeID" value="<?php echo $row['EmployeeID']; ?>">
+                                        <button type="submit" class="remove-btn">Remove</button>
+                                    </form>
+                                <?php else: ?>
+                                    <span>N/A</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php } ?>
@@ -267,18 +272,13 @@ if (!$result) {
     <script>
         // Function to toggle the sidebar
         function toggleSidebar() {
-            var sidebar = document.getElementById("sidebar");
-            var container = document.getElementById("main-container");
-            if (sidebar.classList.contains("active")) {
-                sidebar.classList.remove("active");
-                container.style.marginLeft = "0"; // Use full width when the sidebar is hidden
-            } else {
-                sidebar.classList.add("active");
-                container.style.marginLeft = "250px"; // Adjust the container margin when the sidebar is shown
-            }
+            var sidebar = document.getElementById('sidebar');
+            var mainContainer = document.getElementById('main-container');
+            sidebar.classList.toggle('active');
+            mainContainer.classList.toggle('active');
         }
 
-        // Function to confirm before removing an executive
+        // Function to confirm removal
         function confirmRemove() {
             return confirm("Are you sure you want to remove this executive?");
         }

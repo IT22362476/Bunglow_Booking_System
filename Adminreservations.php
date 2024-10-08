@@ -1,13 +1,6 @@
-<?php
-include("Mysqlconnection.php");
-
-// Fetch reservation data from the database
-$query = "SELECT * FROM reservations";
-$result = mysqli_query($connection, $query);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,76 +8,41 @@ $result = mysqli_query($connection, $query);
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f8f5; /* Light green background for the whole page */
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
 
-        h2 {
-            text-align: center;
-            color: #2f8f2f; /* Green color for the heading */
-            margin-top: 20px;
+        .container {
+            padding: 20px;
+            transition: margin-left 0.3s;
         }
 
-        table {
-            width: 90%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adding a slight shadow for better visibility */
+        .menu-toggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #235428;
+            z-index: 1001;
         }
 
-        th, td {
-            border: 1px solid #ddd;
-            text-align: left;
-            padding: 10px;
-        }
-
-        th {
-            background-color: #2f8f2f; /* Green color for table headers */
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9; /* Alternating row colors */
-        }
-
-        tr:nth-child(odd) {
-            background-color: #ffffff;
-        }
-
-        .edit-btn, .remove-btn {
-            display: inline-block;
-            padding: 5px 10px;
-            color: #fff;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-
-        .edit-btn {
-            background-color: #4CAF50; /* Green button for editing */
-        }
-
-        .remove-btn {
-            background-color: #f44336; /* Red button for deleting */
-        }
-
-        /* Sidebar styling */
         .sidebar {
             width: 250px;
-            background-color: #4CAF50; /* Green background for the sidebar */
-            color: white; /* White text color for the sidebar */
+            background-color: #4CAF50;
+            color: white;
             position: fixed;
             height: 100%;
             top: 0;
-            left: -250px; /* Initially hidden */
+            left: -250px;
             overflow: hidden;
-            transition: left 0.3s; /* Smooth transition for the sidebar */
-            z-index: 1000; /* Ensure sidebar appears above other content */
+            transition: left 0.3s;
+            z-index: 1000;
         }
 
         .sidebar.active {
-            left: 0; /* Show the sidebar */
+            left: 0;
         }
 
         .sidebar .nav-list {
@@ -106,40 +64,125 @@ $result = mysqli_query($connection, $query);
         }
 
         .sidebar .nav-items a:hover {
-            background-color: #45a049; /* Slightly darker green for hover effect */
+            background-color: #45a049;
         }
 
-        /* Toggle button styling */
-        .menu-toggle {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #235428; /* Green color for the menu icon */
-            z-index: 1001; /* Ensure the toggle icon is above other content */
-        }
-
-        /* Main content styles */
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            transition: margin-left 0.3s, width 0.3s;
-        }
-
-        .main-content.shrink {
-            margin-left: 0;
+        table {
             width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            border: 1px solid #4CAF50;
+            padding: 10px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #e8f5e9;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            z-index: 1;
+            right: 0;
+            margin-top: 10px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown .show {
+            display: block;
+        }
+        .search-input {
+            padding: 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            width: 200px;
+            margin-left: 10px;
+        }
+
+        .date-input {
+            padding: 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        .edit-btn,
+        .remove-btn {
+            display: inline-block;
+            padding: 5px 10px;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .edit-btn {
+            background-color: #4CAF50;
+        }
+
+        .remove-btn {
+            background-color: #f44336;
+        }
+
+        .Addbtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 20px auto;
+            width: fit-content;
         }
     </style>
 </head>
-<body>
 
-    <!-- Menu toggle icon -->
+<body>
     <div class="menu-toggle" onclick="toggleSidebar()">&#9776;</div>
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <nav>
             <ul class="nav-list">
@@ -153,58 +196,105 @@ $result = mysqli_query($connection, $query);
         </nav>
     </div>
 
-    <!-- Main Content Section -->
-    <div class="main-content" id="main-container">
+    <div class="container" id="main-container">
         <h2>Reservations</h2>
-        <table>
-            <tr>
-                <th>Invoice Number</th>
-                <th>Book Date</th> <!-- New Book Date Column -->
-                <th>Employee ID</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Persons</th>
-                <th>Requests</th>
-            </tr>
-            <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+        <div class="search-container">
+            <input type="text" id="search" class="search-input" onkeyup="filterTable()" placeholder="Search by Invoice Number or Employee ID...">
+            <input type="date" id="checkin-filter" class="date-input" oninput="filterTable()" placeholder="Check-in Date">
+            <input type="date" id="checkout-filter" class="date-input" oninput="filterTable()" placeholder="Check-out Date">
+        </div>
+        <table id="userTable">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['invoicenumber']); ?></td>
-                    <td><?php echo htmlspecialchars(date('Y-m-d', strtotime($row['bookdate']))); ?></td> <!-- Displaying bookdate -->
-                    <td><?php echo htmlspecialchars($row['EmployeeID']); ?></td>
-                    <td><?php echo htmlspecialchars($row['checkin']); ?></td>
-                    <td><?php echo htmlspecialchars($row['checkout']); ?></td>
-                    <td><?php echo htmlspecialchars($row['persons']); ?></td>
-                    <td><?php echo htmlspecialchars($row['requests']); ?></td>
+                    <th>Invoice Number</th>
+                    <th>Book Date</th>
+                    <th>Employee ID</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Persons</th>
+                    <th>Requests</th>
+                    <th>Edit</th>
+                    <th>Remove</th>
                 </tr>
-            <?php } ?>
+            </thead>
+            <tbody id="reservation-list">
+                <?php
+                require 'Mysqlconnection.php'; // Include your database connection file
+
+                // Query to select all data from reservations
+                $sql = "SELECT * FROM reservations";
+                $result = mysqli_query($connection, $sql);
+
+                if ($result) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row['invoicenumber']) . "</td>";
+                        echo "<td>" . htmlspecialchars(date('Y-m-d', strtotime($row['bookdate']))) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['EmployeeID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['checkin']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['checkout']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['persons']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['requests']) . "</td>";
+                        echo '<td><a href="Admineditreservations.php?id=' . urlencode($row['invoicenumber']) . '" class="edit-btn">Edit</a></td>';
+                        echo '<td><a href="Adminremovereservations.php?id=' . urlencode($row['invoicenumber']) . '" class="remove-btn" onclick="return confirmDelete()">Delete</a></td>';
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='9'>No data found</td></tr>";
+                }
+
+                // Close the database connection
+                mysqli_close($connection);
+                ?>
+            </tbody>
         </table>
     </div>
 
-    <!-- JavaScript for Sidebar Toggle -->
     <script>
-        // Function to toggle the sidebar
         function toggleSidebar() {
             var sidebar = document.getElementById("sidebar");
             var container = document.getElementById("main-container");
             if (sidebar.classList.contains("active")) {
                 sidebar.classList.remove("active");
-                container.style.marginLeft = "0"; // Use full width when the sidebar is hidden
+                container.style.marginLeft = "0";
             } else {
                 sidebar.classList.add("active");
-                container.style.marginLeft = "250px"; // Adjust the container margin when the sidebar is shown
+                container.style.marginLeft = "250px";
             }
         }
 
-        // Initialize the page based on sidebar state
-        document.addEventListener('DOMContentLoaded', function() {
-            var sidebar = document.getElementById("sidebar");
-            var container = document.getElementById("main-container");
-            if (sidebar.classList.contains("active")) {
-                container.style.marginLeft = "250px";
-            } else {
-                container.style.marginLeft = "0";
+        function confirmDelete() {
+            return confirm('Are you sure you want to delete this reservation?');
+        }
+
+        function filterTable() {
+            const input = document.getElementById('search');
+            const filter = input.value.toLowerCase();
+            const checkinFilter = document.getElementById('checkin-filter').value;
+            const checkoutFilter = document.getElementById('checkout-filter').value;
+
+            const table = document.getElementById('userTable');
+            const trs = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < trs.length; i++) { // Start from 1 to skip the header row
+                const tds = trs[i].getElementsByTagName('td');
+                const invoiceNumber = tds[0].textContent.toLowerCase(); // Invoice Number
+                const employeeId = tds[2].textContent.toLowerCase(); // Employee ID
+                const checkinDate = new Date(tds[3].textContent); // Check-in Date
+                const checkoutDate = new Date(tds[4].textContent); // Check-out Date
+
+                const matchesSearch = invoiceNumber.includes(filter) || employeeId.includes(filter);
+                const matchesCheckin = checkinFilter ? checkinDate >= new Date(checkinFilter) : true;
+                const matchesCheckout = checkoutFilter ? checkoutDate <= new Date(checkoutFilter) : true;
+
+                if (matchesSearch && matchesCheckin && matchesCheckout) {
+                    trs[i].style.display = ''; // Show the row
+                } else {
+                    trs[i].style.display = 'none'; // Hide the row
+                }
             }
-        });
+        }
     </script>
 </body>
+
 </html>

@@ -5,12 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script>
+        function toggleDropdown() {
+            document.getElementById("profileDropdown").classList.toggle("show");
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-img')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5; /* Light grey background for the body */
+            background-color: #f5f5f5;
+            /* Light grey background for the body */
+        }
+
+        .toparea {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            /* Adjust spacing around the area */
+           // background-color: white;
+            /* Optionally add a background for better separation */
+            //box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            /* Add subtle shadow for depth */
+        }
+
+        h2 {
+            color: #235428;
+            /* Green color for the header */
+            margin: 0;
+        }
+
+        .profile-img {
+            cursor: pointer;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            /* Make the profile image circular */
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            z-index: 1;
+            right: 0;
+            margin-top: 10px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown .show {
+            display: block;
         }
 
         .menu-toggle {
@@ -19,25 +97,33 @@
             left: 10px;
             font-size: 24px;
             cursor: pointer;
-            color: #235428; /* Green color for the menu icon */
-            z-index: 1001; /* Ensure the toggle icon is above other content */
+            color: #235428;
+            /* Green color for the menu icon */
+            z-index: 1001;
+            /* Ensure the toggle icon is above other content */
         }
 
         .sidebar {
             width: 250px;
-            background-color: #4CAF50; /* Green background for the sidebar */
-            color: white; /* White text color for the sidebar */
+            background-color: #4CAF50;
+            /* Green background for the sidebar */
+            color: white;
+            /* White text color for the sidebar */
             position: fixed;
             height: 100%;
             top: 0;
-            left: -250px; /* Initially hidden */
+            left: -250px;
+            /* Initially hidden */
             overflow: hidden;
-            transition: left 0.3s; /* Smooth transition for the sidebar */
-            z-index: 1000; /* Ensure sidebar appears above other content */
+            transition: left 0.3s;
+            /* Smooth transition for the sidebar */
+            z-index: 1000;
+            /* Ensure sidebar appears above other content */
         }
 
         .sidebar.active {
-            left: 0; /* Show the sidebar */
+            left: 0;
+            /* Show the sidebar */
         }
 
         .sidebar .nav-list {
@@ -59,7 +145,8 @@
         }
 
         .sidebar .nav-items a:hover {
-            background-color: #45a049; /* Slightly darker green for hover effect */
+            background-color: #45a049;
+            /* Slightly darker green for hover effect */
         }
 
         .main-content {
@@ -78,48 +165,65 @@
             margin-left: 1em;
             width: 100%;
             border-collapse: collapse;
-            border: 2px solid #4CAF50; /* Green border for the table */
-            border-radius: 8px; /* Border radius for rounded corners */
-            overflow: hidden; /* Ensures rounded corners are visible */
+            border: 2px solid #4CAF50;
+            /* Green border for the table */
+            border-radius: 8px;
+            /* Border radius for rounded corners */
+            overflow: hidden;
+            /* Ensures rounded corners are visible */
         }
 
         th {
-            background-color: #4CAF50; /* Green background for headers */
-            color: white; /* White text color for headers */
-            padding: 12px; /* Padding for headers */
+            background-color: #4CAF50;
+            /* Green background for headers */
+            color: white;
+            /* White text color for headers */
+            padding: 12px;
+            /* Padding for headers */
         }
 
         td {
-            border: 1px solid #4CAF50; /* Green border for cells */
-            padding: 10px; /* Padding for cells */
-            text-align: left; /* Align text to the left */
+            border: 1px solid #4CAF50;
+            /* Green border for cells */
+            padding: 10px;
+            /* Padding for cells */
+            text-align: left;
+            /* Align text to the left */
         }
 
         tr:nth-child(even) {
-            background-color: #e8f5e9; /* Light green for even rows */
+            background-color: #e8f5e9;
+            /* Light green for even rows */
         }
 
         tr:nth-child(odd) {
-            background-color: #f9f9f9; /* Light grey for odd rows */
+            background-color: #f9f9f9;
+            /* Light grey for odd rows */
         }
 
         .action-button {
             cursor: pointer;
             text-decoration: none;
-            padding: 0.4em 0.8em; /* Increased padding for better spacing */
+            padding: 0.4em 0.8em;
+            /* Increased padding for better spacing */
             border: solid 1px black;
             border-radius: 0.5em;
-            color: white; /* White text color for buttons */
-            display: inline-block; /* Ensures buttons have spacing */
-            margin-top: 5px; /* Space between buttons */
+            color: white;
+            /* White text color for buttons */
+            display: inline-block;
+            /* Ensures buttons have spacing */
+            margin-top: 5px;
+            /* Space between buttons */
         }
 
         .delete-button {
-            background-color: #ed4239; /* Red for delete buttons */
+            background-color: #ed4239;
+            /* Red for delete buttons */
         }
 
         .edit-button {
-            background-color: #4CAF50; /* Green for edit buttons */
+            background-color: #4CAF50;
+            /* Green for edit buttons */
         }
 
         /* Styling for the Add Member button */
@@ -127,20 +231,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #4CAF50; /* Green background for add button */
-            color: white; /* White text color for add button */
+            background-color: #4CAF50;
+            /* Green background for add button */
+            color: white;
+            /* White text color for add button */
             padding: 10px 20px;
             text-decoration: none;
-            border-radius: 4px; /* Rounded corners */
+            border-radius: 4px;
+            /* Rounded corners */
             cursor: pointer;
-            margin: 20px auto; /* Centering and spacing */
-            width: fit-content; /* Adjusts width to fit content */
+            margin: 20px auto;
+            /* Centering and spacing */
+            width: fit-content;
+            /* Adjusts width to fit content */
         }
 
         /* Additional styling to ensure link within button behaves correctly */
         .Addbtn a {
             text-decoration: none;
-            color: white; /* Ensure link text is white */
+            color: white;
+            /* Ensure link text is white */
         }
     </style>
 </head>
@@ -167,6 +277,15 @@
 
     <!-- Main Content Section -->
     <div class="main-content" id="main-container">
+        <div class="toparea">
+            <h2>Super Admin Dashboard</h2>
+            <li class="nav-list dropdown">
+                <img src="./Images/image.png" class="profile-img" onclick="toggleDropdown()" />
+                <div id="profileDropdown" class="dropdown-content">
+                    <a href="Logout.php">Logout</a>
+                </div>
+            </li>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -228,7 +347,7 @@
         }
 
         // Initialize the page based on sidebar state
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var sidebar = document.getElementById("sidebar");
             var container = document.getElementById("main-container");
             if (sidebar.classList.contains("active")) {

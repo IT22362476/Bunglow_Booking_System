@@ -101,7 +101,7 @@ if (isset($_POST['search'])) {
 }
 
 // Check if a status filter is provided
-if (isset($_POST['status_filter'])) {
+if (isset($_POST['status'])) {
     $statusFilter = $_POST['status'];
 }
 
@@ -132,12 +132,23 @@ if (!empty($conditions)) {
 
 // Prepare and execute the query
 $stmtQuery = $connection->prepare($query);
+
 if (!empty($params)) {
-    $stmtQuery->bind_param(str_repeat('s', count($params)), ...$params);
+    // Create a reference array for call_user_func_array()
+    $refArray = [];
+    foreach ($params as $key => $value) {
+        $refArray[$key] = &$params[$key]; // Bind by reference
+    }
+
+    // Bind the parameters dynamically using call_user_func_array()
+    $paramTypeString = str_repeat('s', count($params)); // Create the types string (all strings here)
+    array_unshift($refArray, $paramTypeString); // Add the param type string as the first element
+
+    call_user_func_array([$stmtQuery, 'bind_param'], $refArray);
 }
+
 $stmtQuery->execute();
 $result = $stmtQuery->get_result();
-
 ?>
 
 <!DOCTYPE html>
@@ -208,7 +219,7 @@ $result = $stmtQuery->get_result();
             margin-left: 0;
             padding: 20px;
             width: 100%;
-            transition: margin-left 0.3s, width 0.3s;
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
         }
 
         .main-content.shrink {
@@ -245,7 +256,8 @@ $result = $stmtQuery->get_result();
         }
 
         select {
-            width: 200px; /* Adjusted to match search field */
+            width: 200px;
+            /* Adjusted to match search field */
             padding: 5px;
         }
 
@@ -264,26 +276,33 @@ $result = $stmtQuery->get_result();
         }
 
         .search-container input {
-            padding: 5px;
-            width: 200px; /* Search field width */
+            padding: 7px;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
         }
 
-        .filter-container {
-            text-align: right;
-            margin-bottom: 20px;
+        .search-container button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 7px;
+            margin-left: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 
 <body>
-    <!-- Menu toggle icon -->
-    <div class="menu-toggle" onclick="toggleSidebar()">&#9776;</div>
-
-    <!-- Sidebar -->
+    <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
     <div class="sidebar" id="sidebar">
-        <nav>
-            <ul class="nav-list">
-            <li class="nav-items"><a href="Superadmindashboard.php">Employee Details</a></li>
+        <div class="nav-list">
+            <ul class="nav-items">
+                <li class="nav-items"><a href="Superadmindashboard.php">Employee Details</a></li>
                 <li class="nav-items"><a href="Superadminreservations.php">Reservation Details</a></li>
                 <li class="nav-items"><a href="Supercalendaradmin.php">Calendar</a></li>
                 <li class="nav-items"><a href="Superblocked.php">Blocked Days</a></li>
@@ -292,70 +311,73 @@ $result = $stmtQuery->get_result();
                 <li class="nav-items"><a href="Superlinen.php">Linen charges</a></li>
                 <li class="nav-items"><a href="Viewhistories.php">View History</a></li>
             </ul>
-            </ul>
-        </nav>
+        </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="main-content">
         <h1>View Reservation Histories</h1>
 
-        <!-- Search and Filter Form -->
         <div class="search-container">
             <form method="POST" action="">
-                <input type="text" name="search_term" placeholder="Search..." value="<?php echo htmlspecialchars($searchTerm); ?>">
+                <input type="text" name="search_term" placeholder="Search..."
+                    value="<?php echo htmlspecialchars($searchTerm); ?>">
                 <button type="submit" name="search">Search</button>
             </form>
-        </div>
-
-        <div class="filter-container">
+            <br />
             <form method="POST" action="">
-                <select name="status">
-                    <option value="">All Statuses</option>
-                    <option value="Approved Deletion" <?php echo $statusFilter == 'Approved Deletion' ? 'selected' : ''; ?>>Approved Deletion</option>
-                    <option value="Pay & Delete" <?php echo $statusFilter == 'Pay & Delete' ? 'selected' : ''; ?>>Pay & Delete</option>
-                    <!-- Add more options as needed -->
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">Select Status</option>
+                    <option value="Approved" <?php if ($statusFilter == 'Approved')
+                        echo 'selected'; ?>>Approved</option>
+                    <option value="Approved Deletion" <?php if ($statusFilter == 'Approved Deletion')
+                        echo 'selected'; ?>>
+                        Approved Deletion</option>
+                    <option value="Pay & Delete" <?php if ($statusFilter == 'Pay & Delete')
+                        echo 'selected'; ?>>Pay &
+                        Delete</option>
+                    <option value="Completed" <?php if ($statusFilter == 'Completed')
+                        echo 'selected'; ?>>Completed
+                    </option>
                 </select>
-                <button type="submit" name="status_filter">Filter</button>
             </form>
         </div>
 
-        <!-- Reservation History Table -->
         <table>
             <thead>
                 <tr>
                     <th>Invoice Number</th>
                     <th>Employee ID</th>
-                    <th>Check-In</th>
-                    <th>Check-Out</th>
+                    <th>Name</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
                     <th>Persons</th>
                     <th>Requests</th>
                     <th>Status</th>
-                    <th>Employee Name</th>
-                    <th>Actions</th>
+                    <th>Update Status</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($row['invoicenumber']); ?></td>
-                        <td><?php echo htmlspecialchars($row['EmployeeID']); ?></td>
-                        <td><?php echo htmlspecialchars($row['checkin']); ?></td>
-                        <td><?php echo htmlspecialchars($row['checkout']); ?></td>
-                        <td><?php echo htmlspecialchars($row['persons']); ?></td>
-                        <td><?php echo htmlspecialchars($row['requests']); ?></td>
-                        <td><?php echo htmlspecialchars($row['status']); ?></td>
-                        <td><?php echo htmlspecialchars($row['Name']); ?></td>
+                        <td><?php echo $row['invoicenumber']; ?></td>
+                        <td><?php echo $row['EmployeeID']; ?></td>
+                        <td><?php echo $row['Name']; ?></td>
+                        <td><?php echo $row['checkin']; ?></td>
+                        <td><?php echo $row['checkout']; ?></td>
+                        <td><?php echo $row['persons']; ?></td>
+                        <td><?php echo $row['requests']; ?></td>
+                        <td><?php echo $row['status']; ?></td>
                         <td>
                             <form method="POST" action="">
-                                <input type="hidden" name="invoicenumber" value="<?php echo htmlspecialchars($row['invoicenumber']); ?>">
+                                <input type="hidden" name="invoicenumber" value="<?php echo $row['invoicenumber']; ?>">
                                 <select name="status">
-                                <option value="Completed" <?php echo ($row['status'] == 'Completed') ? 'selected' : ''; ?>>Completed</option>
-                                        <option value="deleted" <?php echo ($row['status'] == 'deleted') ? 'selected' : ''; ?>>deleted</option>
-                                        <option value="Approved Deletion" <?php echo ($row['status'] == 'Approved Deletion') ? 'selected' : ''; ?>>Approved Deletion</option>
-                                        <option value="Pay & Delete" <?php echo ($row['status'] == 'Pay & Delete') ? 'selected' : ''; ?>>Pay & Delete</option>
+                                    <option value="Completed" <?php echo ($row['status'] == 'Completed') ? 'selected' : ''; ?>>Completed</option>
+                                    <option value="deleted" <?php echo ($row['status'] == 'deleted') ? 'selected' : ''; ?>>
+                                        deleted</option>
+                                    <option value="Approved Deletion" <?php echo ($row['status'] == 'Approved Deletion') ? 'selected' : ''; ?>>Approved Deletion</option>
+                                    <option value="Pay & Delete" <?php echo ($row['status'] == 'Pay & Delete') ? 'selected' : ''; ?>>Pay & Delete</option>
                                 </select>
-                                <button type="submit" name="update_status">Update Status</button>
+                                <button type="submit" name="update_status">Update</button>
                             </form>
                         </td>
                     </tr>
@@ -366,10 +388,10 @@ $result = $stmtQuery->get_result();
 
     <script>
         function toggleSidebar() {
-            var sidebar = document.getElementById("sidebar");
-            var mainContent = document.getElementById("main-content");
-            sidebar.classList.toggle("active");
-            mainContent.classList.toggle("shrink");
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('shrink');
         }
     </script>
 </body>

@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <script>
+                function toggleDropdown() {
+            document.getElementById("profileDropdown").classList.toggle("show");
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-img')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         /* General styling for the page */
         body {
@@ -17,7 +35,17 @@
             padding: 20px;
             transition: margin-left 0.3s; /* Smooth transition for margin adjustment */
         }
-
+        .menu-toggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #235428;
+            /* Green color for the menu icon */
+            z-index: 1001;
+            /* Ensure the toggle icon is above other content */
+        }
         /* Sidebar styling */
         .sidebar {
             width: 250px;
@@ -67,6 +95,21 @@
             cursor: pointer;
             color: #235428; /* Green color for the menu icon */
             z-index: 1001; /* Ensure the toggle icon is above other content */
+        }
+
+        /* Search bar styling */
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            width: 200px; /* Adjust width as necessary */
+            margin-left: 10px; /* Space between search label and input */
         }
 
         /* General styling for the table */
@@ -152,6 +195,57 @@
             border-radius: 50%; /* Circular picture */
             cursor: pointer;
         }
+        .profile-img {
+            cursor: pointer;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            /* Make the profile image circular */
+        }
+        .toparea {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            /* Adjust spacing around the area */
+           // background-color: white;
+            /* Optionally add a background for better separation */
+            //box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            /* Add subtle shadow for depth */
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            z-index: 1;
+            right: 0;
+            margin-top: 10px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown .show {
+            display: block;
+        }
+
     </style>
 </head>
 
@@ -176,7 +270,20 @@
 
     <!-- Main content area -->
     <div class="container" id="main-container">
-        <table>
+    <div class="toparea">
+            <h2>Admin Dashboard</h2>
+            <li class="nav-list dropdown">
+                <img src="./Images/image.png" class="profile-img" onclick="toggleDropdown()" />
+                <div id="profileDropdown" class="dropdown-content">
+                    <a href="Logout.php">Logout</a>
+                </div>
+            </li>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search" class="search-input" onkeyup="filterTable()" placeholder="Search by EmployeeID or Name...">
+        </div>
+
+        <table id="userTable">
             <thead>
                 <tr>
                     <th>UserID</th>
@@ -215,7 +322,8 @@
                             echo "<td>No picture available</td>";
                         }
 
-                        echo "<td><a href='Userdelete.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button delete-button'>Delete</a></td>";
+                        // Add delete confirmation alert
+                        echo "<td><a href='Userdelete.php?UserID=" . htmlspecialchars($row['UserID']) . "' class='action-button delete-button' onclick='return confirmDelete()'>Delete</a></td>";
                         echo "</tr>";
                     }
                 } else {
@@ -241,6 +349,30 @@
             } else {
                 sidebar.classList.add("active");
                 container.style.marginLeft = "250px"; // Adjust the container margin when the sidebar is shown
+            }
+        }
+
+        // Function to confirm user deletion
+        function confirmDelete() {
+            return confirm('Are you sure you want to delete this user?');
+        }
+
+        // Function to filter the table based on search input
+        function filterTable() {
+            const input = document.getElementById('search');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('userTable');
+            const trs = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < trs.length; i++) { // Start from 1 to skip the header row
+                const tds = trs[i].getElementsByTagName('td');
+                const employeeId = tds[1].textContent.toLowerCase(); // EmployeeID
+                const name = tds[2].textContent.toLowerCase(); // Name
+                if (employeeId.includes(filter) || name.includes(filter)) {
+                    trs[i].style.display = ''; // Show the row
+                } else {
+                    trs[i].style.display = 'none'; // Hide the row
+                }
             }
         }
     </script>

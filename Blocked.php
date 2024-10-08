@@ -14,7 +14,13 @@ if (isset($_POST['delete'])) {
     }
 }
 
+// Check if a date filter is applied
+$dateFilter = isset($_GET['date_filter']) ? mysqli_real_escape_string($connection, $_GET['date_filter']) : '';
+
 $sql = "SELECT date, reason FROM maintenance";
+if (!empty($dateFilter)) {
+    $sql .= " WHERE date = '$dateFilter'";
+}
 $result = mysqli_query($connection, $sql);
 
 if (!$result) {
@@ -36,32 +42,32 @@ if (!$result) {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5; /* Light grey background for the entire page */
+            background-color: #f5f5f5;
             display: flex;
         }
 
         .container {
             padding: 20px;
-            transition: margin-left 0.3s; /* Smooth transition for margin adjustment */
+            transition: margin-left 0.3s;
             flex-grow: 1;
         }
 
         /* Sidebar styling */
         .sidebar {
             width: 250px;
-            background-color: #4CAF50; /* Green background for the sidebar */
-            color: white; /* White text color for the sidebar */
+            background-color: #4CAF50;
+            color: white;
             position: fixed;
             height: 100%;
             top: 0;
-            left: 0; /* Initially shown */
+            left: 0;
             overflow: hidden;
-            transition: width 0.3s; /* Smooth transition for the sidebar */
-            z-index: 1000; /* Ensure sidebar appears above other content */
+            transition: width 0.3s;
+            z-index: 1000;
         }
 
         .sidebar.shrink {
-            width: 0; /* Hide the sidebar */
+            width: 0;
         }
 
         .sidebar .nav-list {
@@ -83,7 +89,7 @@ if (!$result) {
         }
 
         .sidebar .nav-items a:hover {
-            background-color: #45a049; /* Slightly darker green for hover effect */
+            background-color: #45a049;
         }
 
         /* Toggle button styling */
@@ -93,8 +99,8 @@ if (!$result) {
             left: 10px;
             font-size: 24px;
             cursor: pointer;
-            color: #235428; /* Green color for the menu icon */
-            z-index: 1001; /* Ensure the toggle icon is above other content */
+            color: #235428;
+            z-index: 1001;
         }
 
         /* Main content styles */
@@ -158,6 +164,37 @@ if (!$result) {
         .edit-button {
             background-color: #4CAF50;
         }
+
+        /* Date filter input styling */
+        .date-filter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+        }
+
+        .date-filter label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .date-filter input[type="date"] {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .date-filter button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .date-filter button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 
@@ -184,12 +221,21 @@ if (!$result) {
         <div class="container">
             <h2>Blocked Days</h2>
 
+            <!-- Date filter form -->
+            <div class="date-filter">
+                <form method="GET" action="Blocked.php">
+                    <label for="date_filter">Filter by Date:</label>
+                    <input type="date" id="date_filter" name="date_filter" value="<?php echo htmlspecialchars($dateFilter); ?>">
+                    <button type="submit">Filter</button>
+                </form>
+            </div>
+
             <table>
                 <thead>
                     <tr>
                         <th>Date</th>
                         <th>Reason</th>
-                        <th>Action</th> <!-- New column for actions -->
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -200,7 +246,7 @@ if (!$result) {
                             echo "<td>" . htmlspecialchars($row['date']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['reason']) . "</td>";
                             echo "<td>
-                                    <form method='POST' action='Blocked.php' onsubmit='return confirm(\"Are you sure you want to remove this entry?\")'>
+                                    <form method='POST' action='Blocked.php' onsubmit='return confirmDeletion(\"" . htmlspecialchars($row['date']) . "\")'>
                                         <input type='hidden' name='date' value='" . htmlspecialchars($row['date']) . "'>
                                         <button type='submit' name='delete' class='action-button delete-button'>Remove</button>
                                     </form>
@@ -218,7 +264,7 @@ if (!$result) {
         </div>
     </div>
 
-    <!-- JavaScript for Sidebar Toggle -->
+    <!-- JavaScript for Sidebar Toggle and Confirmation -->
     <script>
         // Function to toggle the sidebar
         function toggleSidebar() {
@@ -245,6 +291,11 @@ if (!$result) {
                 sidebar.classList.add('shrink');
                 mainContent.classList.add('shrink');
             }
+        }
+
+        // Function to confirm deletion
+        function confirmDeletion(date) {
+            return confirm("Are you sure you want to remove the blocked day: " + date + "?");
         }
     </script>
 </body>
