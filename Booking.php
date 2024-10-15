@@ -71,7 +71,8 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
 
         .countdown-circle .progress {
             stroke: red;
-            stroke-dasharray: 251; /* 2 * π * radius (40 - stroke-width) */
+            stroke-dasharray: 251;
+            /* 2 * π * radius (40 - stroke-width) */
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 1s linear;
         }
@@ -83,6 +84,27 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
             transform: translate(-50%, -50%);
             font-size: 18px;
             font-weight: bold;
+        }
+        .maincontainer {
+            display: flex;
+            /* Enables flexbox layout */
+            flex-direction: column;
+            /* Arranges children in a vertical column */
+            align-items: center;
+            
+        }
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-button a {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -99,31 +121,34 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
             <div class="countdown-number" id="countdown-number">120</div>
         </div>
     </div>
-
-    <!-- Booking Form -->
-    <form action="Bookingbackend.php" method="post" class="booking-form">
-        <h2>Book Your Stay</h2>
-        <div class="form-group">
-            <label for="checkin">Check-in Date:</label>
-            <input type="text" id="checkin" name="checkin" required>
+    <div class="maincontainer">
+        <!-- Booking Form -->
+        <form action="Bookingbackend.php" method="post" class="booking-form">
+            <h2>Book Your Stay</h2>
+            <div class="form-group">
+                <label for="checkin">Check-in Date:</label>
+                <input type="text" id="checkin" name="checkin" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout">Check-out Date:</label>
+                <input type="text" id="checkout" name="checkout" required>
+            </div>
+            <div class="form-group">
+                <label for="persons">Number of guests:</label>
+                <input type="number" name="persons" required>
+            </div>
+            <div class="form-group">
+                <label for="requests">Special Requests:</label>
+                <textarea name="requests" rows="4" cols="50"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" name="submit">Book Now</button>
+            </div>
+        </form>
+        <div class="back-button">
+            <a href="index.php">Back</a>
         </div>
-        <div class="form-group">
-            <label for="checkout">Check-out Date:</label>
-            <input type="text" id="checkout" name="checkout" required>
-        </div>
-        <div class="form-group">
-            <label for="persons">Number of guests:</label>
-            <input type="number" name="persons" required>
-        </div>
-        <div class="form-group">
-            <label for="requests">Special Requests:</label>
-            <textarea name="requests" rows="4" cols="50"></textarea>
-        </div>
-        <div class="form-group">
-            <button type="submit" name="submit">Book Now</button>
-        </div>
-    </form>
-
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         // Countdown Timer JavaScript

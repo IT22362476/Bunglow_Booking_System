@@ -24,7 +24,16 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time stamp
 // Retrieve the EmployeeID from the session
 $employeeID = $_SESSION['EmployeeID'];
 
+// Fetch user name from the database
+$query = "SELECT Name FROM users WHERE EmployeeID = ?";
+$stmt = $connection->prepare($query);
+$stmt->bind_param("s", $employeeID);
+$stmt->execute();
+$stmt->bind_result($userName);
+$stmt->fetch();
+$stmt->close();
 
+// Close the database connection
 $connection->close();
 ?>
 
@@ -92,6 +101,23 @@ $connection->close();
             height: 30px;
             width: 30px;
         }
+
+        /* Flexbox for center alignment */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            /* Aligns items in a column */
+            align-items: center;
+            /* Centers items horizontally */
+            margin-top: 5px;
+            /* Adds some space above the user name */
+        }
+
+        .user-name {
+            font-size: small;
+            /* Set the font size for the user's name */
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -109,10 +135,14 @@ $connection->close();
             </div>
             <div class="part3">
                 <li class="nav-list dropdown">
-                    <img src="./Images/image.png" class="profile-img" onclick="toggleDropdown()" />
-                    <div id="profileDropdown" class="dropdown-content">
-                        <a href="Profile.php">View Profile</a>
-                        <a href="Logout.php">Logout</a>
+                    <!-- Center the user's name and icon -->
+                    <div class="user-info">
+                        <img src="./Images/image.png" class="profile-img" onclick="toggleDropdown()" />
+                        <div id="profileDropdown" class="dropdown-content">
+                            <a href="Profile.php">View Profile</a>
+                            <a href="Logout.php">Logout</a>
+                        </div>
+                        <div class="user-name"><?php echo htmlspecialchars($userName); ?></div>
                     </div>
                 </li>
                 <li class="bookbtn">

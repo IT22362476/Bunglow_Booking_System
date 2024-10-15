@@ -13,11 +13,11 @@ function sendUpdatedBillEmail($employeeID, $invoicenumber, $pillowCases, $bedShe
     $stmt = $connection->prepare("SELECT Email FROM executives WHERE EmployeeID = ?");
     $stmt->bind_param("s", $employeeID);
     $stmt->execute();
-    $stmt->bind_result($email);
+    $stmt->bind_result($Email);
     $stmt->fetch();
     $stmt->close();
 
-    if ($email) {
+    if ($Email) {
         $mail = new PHPMailer;
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
@@ -28,7 +28,7 @@ function sendUpdatedBillEmail($employeeID, $invoicenumber, $pillowCases, $bedShe
         $mail->Port = 465;
 
         $mail->setFrom('denuwansathsara0412@gmail.com', 'Denuwan');
-        $mail->addAddress($email);
+        $mail->addAddress($Email);
 
         $mail->isHTML(true);
         $mail->Subject = 'Your Updated Bill Details';
@@ -263,6 +263,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 margin-bottom: 20px;
                 color: #4CAF50;
             }
+            .backbtn a {
+                text-decoration: none;
+                color: black;
+            }
+
+            .backbtn button{
+                padding: 10px 20px;
+                border-radius: 4px;
+                background-color:green;
+                color: white;
+
+            }
         </style>
     </head>
 
@@ -299,6 +311,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <br>
                 <input type="submit" value="Update Total Bill">
             </form>
+        </div>
+        <div class="backbtn">
+            <a href="Operationaldashboard.php"><button>Back</button></a>
         </div>
     </body>
 

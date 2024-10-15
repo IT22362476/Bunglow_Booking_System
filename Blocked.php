@@ -212,6 +212,8 @@ if (!$result) {
                 <li class="nav-items"><a href="Adminreservations.php">Reservations</a></li>
                 <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
                 <li class="nav-items"><a href="Executives.php">Executives</a></li>
+                <li class="nav-items"><a href="Linen.php">Linen charges</a></li>
+
             </ul>
         </nav>
     </div>

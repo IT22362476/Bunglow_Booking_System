@@ -52,17 +52,21 @@ if (isset($_POST['update_status'])) {
         $EmployeeEmail = $rowUser['Email'];
         $EmployeeName = $rowUser['Name'];
 
+        $divisionQuery = "SELECT email FROM division_emails WHERE division = 'HR'";
+        $resultDivision = $connection->query($divisionQuery);
+        $rowDivision = $resultDivision->fetch_assoc();
+        $adminEmail = $rowDivision['email']; // This is the email for 'HR' division
+
         // Send email based on the selected status
         if ($newStatus == 'Approved Deletion') {
             $subject = "Miriyakalle Bungalow Management - Approved Deletion";
             $body = "\nDon't make any deductions relevant to $EmployeeID($EmployeeName). This is management approved.\n\nBest regards,\nManagement";
-            sendEmail($EmployeeEmail, "dewa20021030@gmail.com", $subject, $body);
+            sendEmail($EmployeeEmail, $adminEmail, $subject, $body); // Use the fetched admin email
         } elseif ($newStatus == 'Pay & Delete') {
             $subject = "Miriyakalle Bungalow - Fine Deduction";
             $body = "\nDeduct Rs.2500 from $EmployeeName ($EmployeeID) due to bungalow fine.\n\nBest regards,\nManagement";
-            sendEmail($EmployeeEmail, "dewa20021030@gmail.com", $subject, $body);
+            sendEmail($EmployeeEmail, $adminEmail, $subject, $body); // Use the fetched admin email
         }
-
         echo "Status updated, 'editedby' updated, and email sent successfully!";
     } else {
         echo "Error updating status: " . $connection->error;
@@ -76,12 +80,12 @@ function sendEmail($employeeEmail, $adminEmail, $subject, $body)
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
-    $mail->Username = 'denuwansathsara0412@gmail.com';
-    $mail->Password = 'boaa moki kmax yzyz'; // Consider moving sensitive info to a secure environment
+    $mail->Username = 'booking.meeriyakelle@gmail.com';
+    $mail->Password = 'elwk soix zwyo pzmc'; // Consider moving sensitive info to a secure environment
     $mail->SMTPSecure = 'ssl';
     $mail->Port = 465;
 
-    $mail->setFrom('denuwansathsara0412@gmail.com', 'Denuwan');
+    $mail->setFrom('booking.meeriyakelle@gmail.com', 'Miriyakalle Bunglow');
     $mail->addAddress($employeeEmail);
     $mail->addAddress($adminEmail);
 

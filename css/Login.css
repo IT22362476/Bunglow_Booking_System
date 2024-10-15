@@ -90,14 +90,14 @@ button {
   font-family: "Montserrat", sans-serif;
   font-weight: 500;
   color: #fff;
-  background-color: #007bff;
+  background-color: #24a82b;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #0fb300;
 }
 
 .empInputContainer a {

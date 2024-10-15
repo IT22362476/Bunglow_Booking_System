@@ -104,7 +104,7 @@ function sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $t
             echo "<h2>Email has been sent to the employee.</h2>";
             echo "<a href='Operationaldashboard.php' style='display: inline-block; background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Back to Dashboard</a>";
         }
-        
+
     } else {
         echo "<h1>Employee email not found.</h1>";
     }
@@ -300,7 +300,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             // Insert the bill into the database with each item stored separately
             $stmt = $connection->prepare("INSERT INTO bills (invoicenumber, EmployeeID, pillowCases, bedSheets, towels, handserviette, duster, bathmate, apron, otherExpenses, totalBill, damages,damages1,damages2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)");
-            $stmt->bind_param("isiiiiiiiddsss", $invoicenumber, $employeeID, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $damageImage,$damageImage1,$damageImage2);
+            $stmt->bind_param("isiiiiiiiddsss", $invoicenumber, $employeeID, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $damageImage, $damageImage1, $damageImage2);
 
             if ($stmt->execute()) {
                 echo "<h2>Bill has been successfully created.</h2>";
@@ -330,7 +330,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             .form-container {
                 max-width: 600px;
                 margin: 0 auto;
-                padding: 20px;
+                padding: 85px;
                 border: 2px solid #4CAF50;
                 border-radius: 8px;
                 background-color: #f9f9f9;
@@ -390,8 +390,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 font-size: 16px;
                 /* Adjust font size */
             }
-            .imageflx{
-                display:flex;
+
+            .imageflx {
+                display: flex;
+            }
+
+            .backbtn a {
+                text-decoration: none;
+                color: black;
+            }
+
+            .backbtn button{
+                padding: 10px 20px;
+                border-radius: 4px;
+                background-color:green;
+                color: white;
+
             }
         </style>
     </head>
@@ -445,6 +459,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <button type="submit" class="subbtn">Calculate Total Bill</button>
                 </div>
             </form>
+
+        </div>
+        <div class="backbtn">
+            <a href="Operationaldashboard.php"><button>Back</button></a>
         </div>
     </body>
 
