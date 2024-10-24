@@ -264,6 +264,8 @@
                 <li class="nav-items"><a href="Updatetrack.php">Update Tracker</a></li>
                 <li class="nav-items"><a href="Executives.php">Executives</a></li>
                 <li class="nav-items"><a href="Linen.php">Linen charges</a></li>
+                <li class="nav-items"><a href="Chargeshistory.php">Charges history</a></li>
+
             </ul>
         </nav>
     </div>

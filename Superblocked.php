@@ -177,7 +177,7 @@ if (!$result) {
                 <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
                 <li class="nav-items"><a href="Superlinen.php">Linen charges</a></li>
                 <li class="nav-items"><a href="Viewhistories.php">View History</a></li>
-
+                <li class="nav-items"><a href="Divisionemails.php">Emails Management</a></li>
 
             </ul>
         </nav>

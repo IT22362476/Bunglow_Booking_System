@@ -189,7 +189,7 @@
             if (confirmation) {
                 // If confirmed, send an AJAX request to the server to trigger email sending
                 const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'sendEmail.php', true);
+                xhr.open('POST', 'Operationaldashboard.php', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -306,8 +306,8 @@ use PHPMailer\PHPMailer\Exception;
 // sendEmail.php file
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve the form data
-    $employeeID = $_POST['EmployeeID'];  // Ensure these match your form data keys
-    $name = $_POST['Name'];
+    $employeeID = $_POST['employeeID'];  // Ensure these match your form data keys
+    $name = $_POST['name'];
 
     // Create a new PHPMailer instance
     $mail = new PHPMailer(true);

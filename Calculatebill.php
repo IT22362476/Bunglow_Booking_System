@@ -6,6 +6,8 @@ require 'PHPMailer/src/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
+date_default_timezone_set('Asia/Colombo');
+
 function sendBillEmail($employeeID, $invoicenumber, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $pillowCasesPrice, $bedSheetsPrice, $towelsPrice, $handserviettePrice, $dusterPrice, $bathmatePrice, $apronPrice)
 {
     global $connection;
@@ -298,9 +300,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($count > 0) {
             echo "<h1>Error: The invoicenumber already exists.</h1>";
         } else {
+            $billcreatedat = date('Y-m-d H:i:s'); 
             // Insert the bill into the database with each item stored separately
-            $stmt = $connection->prepare("INSERT INTO bills (invoicenumber, EmployeeID, pillowCases, bedSheets, towels, handserviette, duster, bathmate, apron, otherExpenses, totalBill, damages,damages1,damages2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)");
-            $stmt->bind_param("isiiiiiiiddsss", $invoicenumber, $employeeID, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $damageImage, $damageImage1, $damageImage2);
+            $stmt = $connection->prepare("INSERT INTO bills (invoicenumber, EmployeeID, pillowCases, bedSheets, towels, handserviette, duster, bathmate, apron, otherExpenses, totalBill, damages,damages1,damages2,billcreatedat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)");
+            $stmt->bind_param("isiiiiiiiddssss", $invoicenumber, $employeeID, $pillowCases, $bedSheets, $towels, $handserviette, $duster, $bathmate, $apron, $otherExpenses, $totalBill, $damageImage, $damageImage1, $damageImage2,$billcreatedat);
 
             if ($stmt->execute()) {
                 echo "<h2>Bill has been successfully created.</h2>";

@@ -40,7 +40,7 @@
             margin-bottom: 20px;
             padding: 10px 20px;
             /* Adjust spacing around the area */
-           // background-color: white;
+            // background-color: white;
             /* Optionally add a background for better separation */
             //box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             /* Add subtle shadow for depth */
@@ -271,7 +271,7 @@
                 <li class="nav-items"><a href="Superexecutives.php">Executives</a></li>
                 <li class="nav-items"><a href="Superlinen.php">Linen charges</a></li>
                 <li class="nav-items"><a href="Viewhistories.php">View History</a></li>
-                <li class="nav-items"><a href="Divisionemails.php">View History</a></li>
+                <li class="nav-items"><a href="Divisionemails.php">Emails Management</a></li>
             </ul>
         </nav>
     </div>
